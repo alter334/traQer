@@ -18,8 +18,8 @@ type Handler struct {
 }
 
 // ハンドラ作成
-func NewHandler(db *sqlx.DB, client *traq.APIClient, auth context.Context, lasttrack time.Time) *Handler {
-	return &Handler{db: db, client: client, auth: auth, lasttrack: lasttrack}
+func NewHandler(db *sqlx.DB, client *traq.APIClient, auth context.Context, lasttrack time.Time, lastmessageuuid string) *Handler {
+	return &Handler{db: db, client: client, auth: auth, lasttrack: lasttrack, lastmessageuuid: lastmessageuuid}
 }
 
 //------------------------------------------------
@@ -64,6 +64,8 @@ func (h *Handler) GetUserPostCount() {
 		userMessages = append(userMessages, message)
 		log.Println("traQing:", i, "mescount:", message.TotalMessageCount)
 	}
+	//収集完了時刻を最終調査時刻とする
+	h.lasttrack = time.Now().UTC()
 
 	//ユーザデータのdb反映
 	for _, message := range userMessages {
@@ -111,7 +113,7 @@ func (h *Handler) SearchMessagesRunner() {
 
 	//mapに応じてsqlを発行
 	for userId, messageCount := range messageCountperUser {
-		log.Println("ユーザUUID:", userId, "取得数:", messageCount)
+		log.Println("ユーザUUID:", userId, "実追加数:", messageCount)
 		_, err := h.db.Exec("INSERT INTO `messagecounts`(`totalpostcounts`,`userid`) VALUES(?,?) ON DUPLICATE KEY UPDATE `totalpostcounts`=`totalpostcounts`+VALUES(totalpostcounts)", messageCount, userId)
 		if err != nil {
 			log.Println("Internal error:", err.Error())
@@ -133,5 +135,3 @@ func (h *Handler) CorrectUserMessageDiff(from time.Time, to time.Time, offset in
 	return messages, nil
 
 }
-
-//差分取得実施(limit等条件のため)

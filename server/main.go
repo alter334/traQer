@@ -53,21 +53,21 @@ func main() {
 	db := _db
 	client := traq.NewAPIClient(traq.NewConfiguration())
 	auth := context.WithValue(context.Background(), traq.ContextAccessToken, os.Getenv("TRAQ_TOKEN"))
-	h := handler.NewHandler(db, client, auth, time.Now().UTC())
+	h := handler.NewHandler(db, client, auth, time.Now().UTC(),"")
 
 	c := cron.New() //定時実行用
 	e := echo.New()
 
 	//再起動でデータ取得
 	//SELECT EXISTS (SELECT * FROM `messagecounts`)
-	if true {
+	if false {
 		h.GetUserPostCount()
 	}
 	//cron動作確認
 	c.AddFunc("* * * * *", func() { log.Println("cron is running") })
 	//1日毎に全ユーザ読み込みを行う(データの補正,午前4時に実施)
 	c.AddFunc("0 4 * * *", h.GetUserPostCount)
-	//3分ごとに差分読み取りを行う
+	//5分ごとに差分読み取りを行う
 	c.AddFunc("0-59/5 * * * *", h.SearchMessagesRunner)
 
 	c.Start()
