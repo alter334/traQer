@@ -53,21 +53,23 @@ func main() {
 	db := _db
 	client := traq.NewAPIClient(traq.NewConfiguration())
 	auth := context.WithValue(context.Background(), traq.ContextAccessToken, os.Getenv("TRAQ_TOKEN"))
-	h := handler.NewHandler(db, client, auth, time.Now().UTC().Add(-10*time.Minute))
+	h := handler.NewHandler(db, client, auth, time.Now().UTC())
 
 	c := cron.New() //定時実行用
 	e := echo.New()
 
-	//特定の状況でデータ取得
+	//再起動でデータ取得
 	//SELECT EXISTS (SELECT * FROM `messagecounts`)
-	if false {
-		h.GetUserPostCount()
-	}
-
-	h.SearchMessagesRunner()
+	// if false {
+	// 	h.GetUserPostCount()
+	// }
 
 	//1日毎に全ユーザ読み込みを行う(データの補正,午前4時に実施)
-	c.AddFunc("0 4 * * *", h.GetUserPostCount)
+	c.AddFunc("49 7 * * *", h.GetUserPostCount)
+	//3分ごとに差分読み取りを行う
+	c.AddFunc("0-59/5 * * * *", h.SearchMessagesRunner)
+
+	c.Start()
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -75,7 +77,6 @@ func main() {
 	e.GET("/ping", func(c echo.Context) error { return c.String(http.StatusOK, "pong") })
 	e.GET("/alter", func(c echo.Context) error { return c.String(http.StatusOK, "pong") })
 
-	c.Start()
 	e.Logger.Fatal(e.Start(":8080"))
 
 }

@@ -32,6 +32,8 @@ type UserMessages struct {
 
 // ユーザ毎traQ投稿数DB記録補正:高負荷のため1日に1回実施
 func (h *Handler) GetUserPostCount() {
+	//最終探索時間
+	h.lasttrack = time.Now().UTC()
 	//ユーザリストの取得
 	v, _, err := h.client.UserApi.
 		GetUsers(h.auth).
@@ -79,26 +81,34 @@ func (h *Handler) SearchMessagesRunner() {
 	from := h.lasttrack
 	to := time.Now().UTC()
 	h.lasttrack = time.Now().UTC()
-	allcollected := false
+
+	//記録用mapの作成
+	messageCountperUser := map[string]int{}
 
 	//オフセットを100ずつ増やすことで100件しかメッセージが格納されない問題を解決する
-	for i := 0; !allcollected; i += 100 {
+	for i := 0; ; i += 100 {
 		messages, err := h.CorrectUserMessageDiff(from, to, i)
 		if err != nil {
 			log.Println("Internal error:", err.Error())
 			break
 		}
-		if messages.TotalHits < 100 {
-			allcollected = true
-		}
+		//取得したメッセージをmap型に記録
 		for _, message := range messages.Hits {
-			_, err = h.db.Exec("INSERT INTO `messagecounts`(`totalpostcounts`,`userid`) VALUES(1,?) ON DUPLICATE KEY UPDATE `totalpostcounts`=1+`totalpostcounts`", message.UserId)
-			if err != nil {
-				log.Println("Internal error:", err.Error())
-				return
-			}
+			messageCountperUser[message.UserId]++
 		}
+		if len(messages.Hits) < 100 {
+			break
+		}
+	}
 
+	//mapに応じてsqlを発行
+	for userId, messageCount := range messageCountperUser {
+		log.Println("ユーザUUID:", userId, "取得数:", messageCount)
+		_, err := h.db.Exec("INSERT INTO `messagecounts`(`totalpostcounts`,`userid`) VALUES(?,?) ON DUPLICATE KEY UPDATE `totalpostcounts`=`totalpostcounts`+VALUES(totalpostcounts)", messageCount, userId)
+		if err != nil {
+			log.Println("Internal error:", err.Error())
+			return
+		}
 	}
 
 }
@@ -111,6 +121,7 @@ func (h *Handler) CorrectUserMessageDiff(from time.Time, to time.Time, offset in
 		return messages, err
 	}
 	log.Println("取得数:", len(messages.Hits))
+	log.Println("取得mes:", messages.TotalHits)
 	return messages, nil
 
 }
