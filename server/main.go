@@ -60,13 +60,13 @@ func main() {
 
 	//再起動でデータ取得
 	//SELECT EXISTS (SELECT * FROM `messagecounts`)
-	if false {
+	if true {
 		h.GetUserPostCount()
 	}
 	//cron動作確認
 	c.AddFunc("* * * * *", func() { log.Println("cron is running") })
-	//1日毎に全ユーザ読み込みを行う(データの補正,午前4時に実施)
-	c.AddFunc("0 4 * * *", h.GetUserPostCount)
+	//1日毎に全ユーザ読み込みを行う(データの補正,午前4時に実施 ただしNSはUTC)
+	c.AddFunc("0 13 * * *", h.GetUserPostCount)
 	//5分ごとに差分読み取りを行う
 	c.AddFunc("0-59/5 * * * *", h.SearchMessagesRunner)
 
