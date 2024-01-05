@@ -10,10 +10,11 @@ import (
 )
 
 type Handler struct {
-	db        *sqlx.DB
-	client    *traq.APIClient
-	auth      context.Context
-	lasttrack time.Time
+	db              *sqlx.DB
+	client          *traq.APIClient
+	auth            context.Context
+	lasttrack       time.Time
+	lastmessageuuid string
 }
 
 // ハンドラ作成
@@ -78,12 +79,13 @@ func (h *Handler) GetUserPostCount() {
 
 // ユーザ毎一定期間traQ投稿数取得(差分取得のため誤差有)
 func (h *Handler) SearchMessagesRunner() {
-	from := h.lasttrack
+	from := h.lasttrack.Add(-time.Minute) // メッセージ反映にある1分のラグを捕捉する
 	to := time.Now().UTC()
 	h.lasttrack = time.Now().UTC()
 
 	//記録用mapの作成
 	messageCountperUser := map[string]int{}
+	var tmplastmessageuuid string
 
 	//オフセットを100ずつ増やすことで100件しかメッセージが格納されない問題を解決する
 	for i := 0; ; i += 100 {
@@ -94,11 +96,17 @@ func (h *Handler) SearchMessagesRunner() {
 		}
 		//取得したメッセージをmap型に記録
 		for _, message := range messages.Hits {
+			if message.Id == h.lastmessageuuid {
+				break
+			}
 			messageCountperUser[message.UserId]++
+			tmplastmessageuuid = message.Id
 		}
 		if len(messages.Hits) < 100 {
 			break
 		}
+		//取得した最後のメッセージのuuidを取得
+		h.lastmessageuuid = tmplastmessageuuid
 	}
 
 	//mapに応じてsqlを発行
