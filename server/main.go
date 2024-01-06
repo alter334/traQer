@@ -59,6 +59,9 @@ func main() {
 	e := echo.New()
 
 	//再起動でデータ取得
+	//ハンドラに情報を持たせる
+	h.MessageCountsBind()
+
 	//SELECT EXISTS (SELECT * FROM `messagecounts`)
 	if false {
 		h.GetUserPostCount()
@@ -77,7 +80,7 @@ func main() {
 
 	e.GET("/ping", func(c echo.Context) error { return c.String(http.StatusOK, "pong") })
 	e.GET("/alter", func(c echo.Context) error { return c.String(http.StatusOK, "pong") })
-	e.GET("/test",h.GetMessageCountsParUser)
+	e.GET("/messages", h.GetMessageCounts)
 
 	e.Logger.Fatal(e.Start(":8080"))
 

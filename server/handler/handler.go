@@ -2,8 +2,8 @@ package handler
 
 import (
 	"context"
-	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -38,24 +38,19 @@ func NewHandler(db *sqlx.DB, client *traq.APIClient, auth context.Context, lastt
 	return &Handler{db: db, client: client, auth: auth, lasttrack: lasttrack, lastmessageuuid: lastmessageuuid}
 }
 
-// 全データベースを読み取るAPI
-func (h *Handler) GetMessageCountsParUser(c echo.Context) error {
-	var messageCountuuid []MessageCountuuid
-	err := h.db.Select(&messageCountuuid, "SELECT * FROM `messagecounts` ORDER BY `totalpostcounts` DESC")
+// 全データベースを読み取るAPI ただし制御機構付
+func (h *Handler) GetMessageCounts(c echo.Context) error {
+	//クエリパラメタでページ制御 50*page
+	pagestr := c.QueryParam("page")
+	if pagestr == "" {
+		return c.JSON(http.StatusOK, h.nowhavingdata)
+	}
+	page, err := strconv.Atoi(pagestr)
 	if err != nil {
-		return c.String(http.StatusInternalServerError, err.Error())
+		return c.String(http.StatusBadRequest, err.Error())
 	}
 
-	var messageCountwithUser []UserDetailWithMessageCount
-	for i, messageCount := range messageCountuuid {
-		userdetail, r, err := h.client.UserApi.GetUser(h.auth, messageCount.Userid).Execute()
-		log.Println(i+1, ":",messageCount.MessageCount,":", userdetail.DisplayName)
-		if err != nil {
-			return c.String(r.StatusCode, err.Error())
-		}
-		messageCountwithUser = append(messageCountwithUser, UserDetailWithMessageCount{UserDetail: *userdetail, TotalMessageCount: int64(messageCount.MessageCount)})
-	}
-	return c.JSON(http.StatusOK, messageCountwithUser)
+	return c.JSON(http.StatusOK, h.nowhavingdata[page*50:(page+1)*50])
 }
 
-// 
+//

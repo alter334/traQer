@@ -15,12 +15,12 @@ type Handler struct {
 	auth            context.Context
 	lasttrack       time.Time
 	lastmessageuuid string
+	nowhavingdata   []UserDetailWithMessageCount
 }
 
 //------------------------------------------------
 //ユーザー毎メッセージ数取得系
 //------------------------------------------------
-
 
 // ユーザ毎traQ投稿数DB記録補正:高負荷のため1日に1回実施
 func (h *Handler) GetUserPostCount() {
@@ -67,6 +67,9 @@ func (h *Handler) GetUserPostCount() {
 		}
 
 	}
+	//ハンドラに情報を持たせる
+	h.MessageCountsBind()
+
 	log.Println("done")
 }
 
@@ -111,6 +114,8 @@ func (h *Handler) SearchMessagesRunner() {
 			return
 		}
 	}
+	//ハンドラに情報を持たせる
+	h.MessageCountsBind()
 
 }
 
@@ -124,6 +129,32 @@ func (h *Handler) CorrectUserMessageDiff(from time.Time, to time.Time, offset in
 	log.Println("取得数:", len(messages.Hits))
 	log.Println("取得mes:", messages.TotalHits)
 	return messages, nil
+
+}
+
+// DB読み取り実施,traQAPIより情報取得してハンドラに情報を持たせる
+func (h *Handler) MessageCountsBind() {
+
+	var messageCountuuid []MessageCountuuid
+	err := h.db.Select(&messageCountuuid, "SELECT * FROM `messagecounts` ORDER BY `totalpostcounts` DESC")
+	if err != nil {
+		log.Println("Internal error:", err.Error())
+		return
+	}
+
+	var nowcollectingdata []UserDetailWithMessageCount
+
+	for i, messageCount := range messageCountuuid {
+		userdetail, _, err := h.client.UserApi.GetUser(h.auth, messageCount.Userid).Execute()
+		log.Println(i+1, ":", messageCount.MessageCount, ":", userdetail.DisplayName)
+		if err != nil {
+			log.Println("Internal error:", err.Error())
+			return
+		}
+		nowcollectingdata = append(nowcollectingdata, UserDetailWithMessageCount{UserDetail: *userdetail, TotalMessageCount: int64(messageCount.MessageCount)})
+
+	}
+	h.nowhavingdata = nowcollectingdata
 
 }
 
