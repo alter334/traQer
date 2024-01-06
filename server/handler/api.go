@@ -151,7 +151,9 @@ func (h *Handler) MessageCountsBind() {
 
 	for i, messageCount := range messageCountuuid {
 		userdetail, _, err := h.client.UserApi.GetUser(h.auth, messageCount.Userid).Execute()
-		log.Println(i+1, ":", messageCount.MessageCount, ":", userdetail.DisplayName)
+		if i <= 2 {
+			log.Println(i+1, ":", messageCount.MessageCount, ":", userdetail.DisplayName)
+		}
 		if err != nil {
 			log.Println("Internal error:", err.Error())
 			return
