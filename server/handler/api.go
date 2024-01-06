@@ -18,13 +18,9 @@ type Handler struct {
 }
 
 //------------------------------------------------
-//メッセージ数取得系
+//ユーザー毎メッセージ数取得系
 //------------------------------------------------
 
-type UserMessages struct {
-	User              traq.User `json:"user"`
-	TotalMessageCount int64     `json:"TotalMessageCount"`
-}
 
 // ユーザ毎traQ投稿数DB記録補正:高負荷のため1日に1回実施
 func (h *Handler) GetUserPostCount() {
@@ -121,7 +117,7 @@ func (h *Handler) SearchMessagesRunner() {
 // 差分取得実施(limit等条件のため)
 func (h *Handler) CorrectUserMessageDiff(from time.Time, to time.Time, offset int) (message *traq.MessageSearchResult, err error) {
 	messages, _, err := h.client.MessageApi.SearchMessages(h.auth).
-		Bot(false).After(from).Before(to).Limit(100).Offset(int32(offset)).Execute()
+		Bot(false).After(from).Before(to).Limit(100).Offset(int32(offset)).Sort("createdAt").Execute()
 	if err != nil {
 		return messages, err
 	}
@@ -130,3 +126,7 @@ func (h *Handler) CorrectUserMessageDiff(from time.Time, to time.Time, offset in
 	return messages, nil
 
 }
+
+//--------------------------------------------------------
+// チャンネル毎メッセージ数取得系
+//--------------------------------------------------------
