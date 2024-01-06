@@ -91,19 +91,24 @@ func (h *Handler) SearchMessagesRunner() {
 			break
 		}
 		//取得したメッセージをmap型に記録
-		for _, message := range messages.Hits {
+
+		for j, message := range messages.Hits {
+			if i == 0 && j == 0 {
+				//取得した最新のメッセージのuuidを取得
+				tmplastmessageuuid = message.Id
+			}
 			if message.Id == h.lastmessageuuid {
 				break
 			}
 			messageCountperUser[message.UserId]++
-			tmplastmessageuuid = message.Id
+
 		}
 		if len(messages.Hits) < 100 {
 			break
 		}
-		//取得した最後のメッセージのuuidを取得
-		h.lastmessageuuid = tmplastmessageuuid
+
 	}
+	h.lastmessageuuid = tmplastmessageuuid
 
 	//mapに応じてsqlを発行
 	for userId, messageCount := range messageCountperUser {
@@ -122,7 +127,7 @@ func (h *Handler) SearchMessagesRunner() {
 // 差分取得実施(limit等条件のため)
 func (h *Handler) CorrectUserMessageDiff(from time.Time, to time.Time, offset int) (message *traq.MessageSearchResult, err error) {
 	messages, _, err := h.client.MessageApi.SearchMessages(h.auth).
-		Bot(false).After(from).Before(to).Limit(100).Offset(int32(offset)).Sort("createdAt").Execute()
+		Bot(false).After(from).Before(to).Limit(100).Offset(int32(offset)).Sort(`createdAt`).Execute()
 	if err != nil {
 		return messages, err
 	}
