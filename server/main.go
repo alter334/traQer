@@ -53,14 +53,14 @@ func main() {
 	db := _db
 	client := traq.NewAPIClient(traq.NewConfiguration())
 	auth := context.WithValue(context.Background(), traq.ContextAccessToken, os.Getenv("TRAQ_TOKEN"))
-	h := handler.NewHandler(db, client, auth, time.Now().UTC(),"")
+	h := handler.NewHandler(db, client, auth, time.Now().UTC(), "")
 
 	c := cron.New() //定時実行用
 	e := echo.New()
 
 	//再起動でデータ取得
 	//SELECT EXISTS (SELECT * FROM `messagecounts`)
-	if true {
+	if false {
 		h.GetUserPostCount()
 	}
 	//cron動作確認
