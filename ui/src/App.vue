@@ -2,7 +2,8 @@
   <main>
     <div :class="$style.container">
       <header :class="$style.header">
-        <router-link to="/ping">Ping</router-link>
+        <router-link to="/ping">Ping|</router-link>
+        <router-link to="/message">Message|</router-link>
       </header>
 
       <router-view />

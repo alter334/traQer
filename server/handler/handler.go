@@ -21,8 +21,12 @@ type UserMessages struct {
 
 // 取得したメッセージを詳細にstract
 type UserDetailWithMessageCount struct {
-	UserDetail        traq.UserDetail `json:"userdetail"`
-	TotalMessageCount int64           `json:"TotalMessageCount"`
+	Id string `json:"id"`
+	DisplayName string `json:"displayname"`
+	Name string `json:"name"`
+	Groups []string `json:"groups"`
+	Homechannnel string `json:"homechannnel"`
+	TotalMessageCount int64           `json:"totalmessagecount"`
 }
 
 // メッセージ取得用stract
