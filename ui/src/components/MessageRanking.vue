@@ -10,15 +10,22 @@ interface UserDetailWithMessageCount{
 	totalmessagecount: number         
 }
 
-const rankingData = ref<UserDetailWithMessageCount[]>()
+const rankingDatas = ref<UserDetailWithMessageCount[]>()
 
 onMounted(async () => {
   const res = await fetch('api/messages')
   if (res.ok) {
-    rankingData.value = await res.json()
+    rankingDatas.value = await res.json()
   }
 })
 </script>
 <template>
-  {{ rankingData }}
+  <div>
+    <div><h2>総合投稿数ランキング</h2></div>
+    <ol>
+      <li v-for="rankingData in rankingDatas" :key="rankingData.displayname">
+        <div>ユーザー:{{ rankingData.displayname }} 投稿数:{{ rankingData.totalmessagecount }}</div>
+      </li>
+    </ol>
+  </div>
 </template>
