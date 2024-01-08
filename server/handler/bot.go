@@ -36,10 +36,10 @@ func (h *Handler) BotHandler() {
 		switch len(cmd) {
 		case 1:
 			message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
-			log.Println("B")
 			h.b.BotSimpleEdit(message, h.BotCollectUserRank(""))
-			log.Println("C")
-			h.b.BotSimplePost(p.Message.ChannelID, "Done")
+		case 2:
+			message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
+			h.b.BotSimpleEdit(message, h.BotCollectUserRank(cmd[1]))
 
 		// case 2:
 		// 	switch cmd[1] {
