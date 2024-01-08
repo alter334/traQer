@@ -21,7 +21,6 @@ type UserDetailWithMessageCount struct {
 	Id                string   `json:"id"`
 	DisplayName       string   `json:"displayname"`
 	Name              string   `json:"name"`
-	Groups            []string `json:"groups"`
 	Homechannnel      string   `json:"homechannnel"`
 	TotalMessageCount int64    `json:"totalmessagecount"`
 }
