@@ -44,3 +44,31 @@ func (b *BotHandler) BotGetUserName(postUserID string) (userName string) {
 	}
 	return userdetail.GetName()
 }
+
+// group名からグループUUIDを取得
+func (b *BotHandler) BotGetGroupUUID(groupName string) (groupuuid string) {
+	groups, httpres, err := b.bot.API().GroupApi.GetUserGroups(context.Background()).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
+	}
+	for _,g:= range groups {
+		if g.Name==groupName {
+			return g.Id
+		}
+	}
+	return ""
+}
+// groupUUIDからグループ所属者を返す
+func (b *BotHandler) BotGetGroupMembers(groupid string) (groupmembersids []string){
+	usergroupmember, httpres, err := b.bot.API().GroupApi.GetUserGroupMembers(context.Background(),groupid).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
+	}
+	for _,member := range usergroupmember{
+		groupmembersids = append(groupmembersids,member.GetId())
+	}
+	return groupmembersids
+
+}
