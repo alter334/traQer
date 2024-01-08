@@ -1,22 +1,11 @@
 package handler
 
 import (
-	"context"
 	"log"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/traPtitech/go-traq"
 )
-
-type Handler struct {
-	db              *sqlx.DB
-	client          *traq.APIClient
-	auth            context.Context
-	lasttrack       time.Time
-	lastmessageuuid string
-	nowhavingdata   []UserDetailWithMessageCount
-}
 
 //------------------------------------------------
 //ユーザー毎メッセージ数取得系
@@ -158,7 +147,7 @@ func (h *Handler) MessageCountsBind() {
 			log.Println("Internal error:", err.Error())
 			return
 		}
-		nowcollectingdata = append(nowcollectingdata, UserDetailWithMessageCount{Id: userdetail.Id,DisplayName: userdetail.DisplayName,Name: userdetail.Name,Groups: userdetail.Groups,Homechannnel: userdetail.GetHomeChannel(), TotalMessageCount: int64(messageCount.MessageCount)})
+		nowcollectingdata = append(nowcollectingdata, UserDetailWithMessageCount{Id: userdetail.Id, DisplayName: userdetail.DisplayName, Name: userdetail.Name, Groups: userdetail.Groups, Homechannnel: userdetail.GetHomeChannel(), TotalMessageCount: int64(messageCount.MessageCount)})
 
 	}
 	h.nowhavingdata = nowcollectingdata

@@ -53,10 +53,11 @@ func main() {
 	db := _db
 	client := traq.NewAPIClient(traq.NewConfiguration())
 	auth := context.WithValue(context.Background(), traq.ContextAccessToken, os.Getenv("TRAQ_TOKEN"))
-	h := handler.NewHandler(db, client, auth, time.Now().UTC(), "")
+	h := handler.NewHandler(db, handler.NewBot(), client, auth, time.Now().UTC(), "")
 
 	c := cron.New() //定時実行用
 	e := echo.New()
+	go h.BotHandler()
 
 	//再起動でデータ取得
 	//ハンドラに情報を持たせる
@@ -74,6 +75,8 @@ func main() {
 	c.AddFunc("0-59/5 * * * *", h.SearchMessagesRunner)
 
 	c.Start()
+
+	time.Sleep(time.Second * 2) //cronスタート用
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())

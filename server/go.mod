@@ -9,11 +9,14 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/traPtitech/go-traq v0.0.0-20230720010114-3bada4b8a73a
+	github.com/traPtitech/traq-ws-bot v1.1.2
 )
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
