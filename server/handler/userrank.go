@@ -18,11 +18,11 @@ type UserMessages struct {
 
 // 取得したメッセージを詳細にstract
 type UserDetailWithMessageCount struct {
-	Id                string   `json:"id"`
-	DisplayName       string   `json:"displayname"`
-	Name              string   `json:"name"`
-	Homechannnel      string   `json:"homechannnel"`
-	TotalMessageCount int64    `json:"totalmessagecount"`
+	Id                string `json:"id" db:"userid"`
+	DisplayName       string `json:"displayname" db:"displayname"`
+	Name              string `json:"name" db:"username"`
+	Homechannel       string `json:"homechannel" db:"homechannelid"`
+	TotalMessageCount int64  `json:"totalmessagecount" db:"totalpostcounts"`
 }
 
 // メッセージ取得用stract
