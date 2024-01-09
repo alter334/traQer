@@ -1,22 +1,11 @@
 package handler
 
 import (
-	"context"
 	"log"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/traPtitech/go-traq"
 )
-
-type Handler struct {
-	db              *sqlx.DB
-	client          *traq.APIClient
-	auth            context.Context
-	lasttrack       time.Time
-	lastmessageuuid string
-	nowhavingdata   []UserDetailWithMessageCount
-}
 
 //------------------------------------------------
 //ユーザー毎メッセージ数取得系
@@ -24,8 +13,7 @@ type Handler struct {
 
 // ユーザ毎traQ投稿数DB記録補正:高負荷のため1日に1回実施
 func (h *Handler) GetUserPostCount() {
-	//最終探索時間
-	h.lasttrack = time.Now().UTC()
+
 	//ユーザリストの取得
 	v, _, err := h.client.UserApi.
 		GetUsers(h.auth).
@@ -55,8 +43,15 @@ func (h *Handler) GetUserPostCount() {
 		userMessages = append(userMessages, message)
 		log.Println("traQing:", i, "mescount:", message.TotalMessageCount)
 	}
+
 	//収集完了時刻を最終調査時刻とする
 	h.lasttrack = time.Now().UTC()
+	//最終探索時間のdb記録
+	_, err = h.db.Exec("UPDATE `trackinginfo` SET `lasttracktime`=?", time.Now().UTC())
+	if err != nil {
+		log.Println("Internal error:", err.Error())
+		return
+	}
 
 	//ユーザデータのdb反映
 	for _, message := range userMessages {
@@ -68,7 +63,7 @@ func (h *Handler) GetUserPostCount() {
 
 	}
 	//ハンドラに情報を持たせる
-	h.MessageCountsBind()
+	h.MessageCountsBind(false)
 
 	log.Println("done")
 }
@@ -78,6 +73,12 @@ func (h *Handler) SearchMessagesRunner() {
 	from := h.lasttrack.Add(-time.Minute) // メッセージ反映にある1分のラグを捕捉する
 	to := time.Now().UTC()
 	h.lasttrack = time.Now().UTC()
+	//最終探索時間のdb記録
+	_, err := h.db.Exec("UPDATE `trackinginfo` SET `lasttracktime`=?", time.Now().UTC())
+	if err != nil {
+		log.Println("Internal error:", err.Error())
+		return
+	}
 
 	//記録用mapの作成
 	messageCountperUser := map[string]int{}
@@ -109,6 +110,13 @@ func (h *Handler) SearchMessagesRunner() {
 
 	}
 	h.lastmessageuuid = tmplastmessageuuid
+	//最新メッセージuuidの更新
+	//最終探索時間のdb記録
+	_, err = h.db.Exec("UPDATE `trackinginfo` SET `lasttrackmessageid`=?", tmplastmessageuuid)
+	if err != nil {
+		log.Println("Internal error:", err.Error())
+		return
+	}
 
 	//mapに応じてsqlを発行
 	for userId, messageCount := range messageCountperUser {
@@ -120,7 +128,7 @@ func (h *Handler) SearchMessagesRunner() {
 		}
 	}
 	//ハンドラに情報を持たせる
-	h.MessageCountsBind()
+	h.MessageCountsBind(false)
 
 }
 
@@ -137,29 +145,46 @@ func (h *Handler) CorrectUserMessageDiff(from time.Time, to time.Time, offset in
 
 }
 
-// DB読み取り実施,traQAPIより情報取得してハンドラに情報を持たせる
-func (h *Handler) MessageCountsBind() {
+// DB読み取り実施, usetraqAPI? traQAPI:手元 より情報取得してハンドラ(traQAPIからの場合はdbにも)に情報を持たせる
+func (h *Handler) MessageCountsBind(usetraqAPI bool) {
 
-	var messageCountuuid []MessageCountuuid
-	err := h.db.Select(&messageCountuuid, "SELECT * FROM `messagecounts` ORDER BY `totalpostcounts` DESC")
+	var dbuserdata []UserDetailWithMessageCount
+	err := h.db.Select(&dbuserdata, "SELECT * FROM `messagecounts` ORDER BY `totalpostcounts` DESC")
 	if err != nil {
 		log.Println("Internal error:", err.Error())
 		return
 	}
 
+	if !usetraqAPI {
+		//API使用しない(DisplayName等更新しない)なら既存のデータだけ返す
+		h.nowhavingdata = dbuserdata
+		return
+	}
+
 	var nowcollectingdata []UserDetailWithMessageCount
 
-	for i, messageCount := range messageCountuuid {
-		userdetail, _, err := h.client.UserApi.GetUser(h.auth, messageCount.Userid).Execute()
+	for i, messageCount := range dbuserdata {
+		userdetail, _, err := h.client.UserApi.GetUser(h.auth, messageCount.Id).Execute()
 		if i <= 2 {
-			log.Println(i+1, ":", messageCount.MessageCount, ":", userdetail.DisplayName)
+			log.Println(i+1, ":", messageCount.TotalMessageCount, ":", userdetail.DisplayName)
 		}
 		if err != nil {
 			log.Println("Internal error:", err.Error())
 			return
 		}
-		nowcollectingdata = append(nowcollectingdata, UserDetailWithMessageCount{Id: userdetail.Id,DisplayName: userdetail.DisplayName,Name: userdetail.Name,Groups: userdetail.Groups,Homechannnel: userdetail.GetHomeChannel(), TotalMessageCount: int64(messageCount.MessageCount)})
-
+		home := userdetail.GetHomeChannel()
+		nowcollectingdata = append(nowcollectingdata,
+			UserDetailWithMessageCount{Id: userdetail.Id,
+				DisplayName:       userdetail.DisplayName,
+				Name:              userdetail.Name,
+				Homechannel:       home,
+				TotalMessageCount: int64(messageCount.TotalMessageCount)})
+		// db更新
+		_, err = h.db.Exec("UPDATE `messagecounts` SET `displayname`=?, `username`=?, `homechannelid`=? WHERE `userid`=?", userdetail.DisplayName, userdetail.Name, home, userdetail.Id)
+		if err != nil {
+			log.Println("Internal error:", err.Error())
+			return
+		}
 	}
 	h.nowhavingdata = nowcollectingdata
 

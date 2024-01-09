@@ -19,7 +19,7 @@ import (
 )
 
 func main() {
-	jst, err := time.LoadLocation("Asia/Tokyo")
+	utc, err := time.LoadLocation("UTC")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,7 +39,7 @@ func main() {
 		DBName:               os.Getenv("MARIADB_DATABASE"),
 		ParseTime:            true,
 		Collation:            "utf8mb4_unicode_ci",
-		Loc:                  jst,
+		Loc:                  utc,
 		AllowNativePasswords: true,
 	}
 
@@ -53,14 +53,30 @@ func main() {
 	db := _db
 	client := traq.NewAPIClient(traq.NewConfiguration())
 	auth := context.WithValue(context.Background(), traq.ContextAccessToken, os.Getenv("TRAQ_TOKEN"))
-	h := handler.NewHandler(db, client, auth, time.Now().UTC(), "")
+
+	var from time.Time
+	err = db.Get(&from, "SELECT `lasttracktime` FROM `trackinginfo`")
+	if err != nil {
+		log.Println("Internal error:", err.Error())
+		return
+	}
+
+	var lasttrackmessageid string
+	err = db.Get(&lasttrackmessageid, "SELECT `lasttrackmessageid` FROM `trackinginfo`")
+	if err != nil {
+		log.Println("Internal error:", err.Error())
+		return
+	}
+
+	h := handler.NewHandler(db, handler.NewBot(), client, auth, from, lasttrackmessageid)
 
 	c := cron.New() //定時実行用
 	e := echo.New()
+	//go h.BotHandler()
 
 	//再起動でデータ取得
 	//ハンドラに情報を持たせる
-	h.MessageCountsBind()
+	h.MessageCountsBind(true)
 
 	//SELECT EXISTS (SELECT * FROM `messagecounts`)
 	if false {
@@ -72,8 +88,12 @@ func main() {
 	c.AddFunc("0 19 * * *", h.GetUserPostCount)
 	//5分ごとに差分読み取りを行う
 	c.AddFunc("0-59/5 * * * *", h.SearchMessagesRunner)
+	//1hごとにハンドラ内traQAPI関連情報更新
+	c.AddFunc("58 * * * *", func() { h.MessageCountsBind(true) })
 
 	c.Start()
+
+	time.Sleep(time.Second * 2) //cronスタート用
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
