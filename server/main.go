@@ -101,6 +101,7 @@ func main() {
 	e.GET("/ping", func(c echo.Context) error { return c.String(http.StatusOK, "pong") })
 	e.GET("/alter", func(c echo.Context) error { return c.String(http.StatusOK, "pong") })
 	e.GET("/messages", h.GetMessageCounts)
+	e.GET("/messages/:groupid", h.GetMessageCountsWithGroup)
 
 	e.Logger.Fatal(e.Start(":8080"))
 

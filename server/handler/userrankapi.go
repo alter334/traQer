@@ -2,6 +2,7 @@ package handler
 
 import (
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/traPtitech/go-traq"
@@ -11,7 +12,7 @@ import (
 //ユーザー毎メッセージ数取得系
 //------------------------------------------------
 
-// ユーザ毎traQ投稿数DB記録補正:高負荷のため1日に1回実施
+// ユーザ毎traQ投稿数DB記録補正:全ユーザstats取得 高負荷のため1日に1回実施
 func (h *Handler) GetUserPostCount() {
 
 	//ユーザリストの取得
@@ -68,7 +69,9 @@ func (h *Handler) GetUserPostCount() {
 	log.Println("done")
 }
 
-// ユーザ毎一定期間traQ投稿数取得(差分取得のため誤差有)
+//----------------------------------------------------------------
+
+// ユーザ毎一定期間traQ投稿数取得(差分取得のため若干誤差の可能性有 基本的にはこの探索法を利用)
 func (h *Handler) SearchMessagesRunner() {
 	from := h.lasttrack.Add(-time.Minute) // メッセージ反映にある1分のラグを捕捉する
 	to := time.Now().UTC()
@@ -144,6 +147,42 @@ func (h *Handler) CorrectUserMessageDiff(from time.Time, to time.Time, offset in
 	return messages, nil
 
 }
+
+//----------------------------------------------------------------
+
+// グループ取得の実施 h.nowhavingdata のグループ毎振り分けを行う []UserDetailWithMessageCount,err を返す
+func (h *Handler) GetGroupMembers(groupid string) (res []UserDetailWithMessageCount, httpres *http.Response, err error) {
+	// groupメンバの取得
+	usergroupmember, httpres, err := h.client.GroupApi.GetUserGroupMembers(h.auth, groupid).Execute()
+	if err != nil {
+		log.Println("Internal error:", err.Error())
+		return res, httpres, err
+	}
+
+	// メンバのuuid取得
+	groupmembersids := []string{}
+	for _, member := range usergroupmember {
+		groupmembersids = append(groupmembersids, member.GetId())
+	}
+
+	// グループメンバをmapkey化 探索高速化
+	groupmembermap := map[string]struct{}{}
+	for _, member := range groupmembersids {
+		groupmembermap[member] = struct{}{}
+	}
+
+	//全ユーザーに対してグループ存在するか探索
+	for _, data := range h.nowhavingdata {
+		_, exist := groupmembermap[data.Id]
+		if exist {
+			res = append(res, data)
+		}
+	}
+
+	return res, httpres, nil
+}
+
+//----------------------------------------------------------------
 
 // DB読み取り実施, usetraqAPI? traQAPI:手元 より情報取得してハンドラ(traQAPIからの場合はdbにも)に情報を持たせる
 func (h *Handler) MessageCountsBind(usetraqAPI bool) {
