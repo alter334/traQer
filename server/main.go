@@ -72,11 +72,11 @@ func main() {
 
 	c := cron.New() //定時実行用
 	e := echo.New()
-	//go h.BotHandler()
+	go h.BotHandler()
 
 	//再起動でデータ取得
 	//ハンドラに情報を持たせる
-	h.MessageCountsBind(true)
+	h.MessageCountsBind(false)
 
 	//SELECT EXISTS (SELECT * FROM `messagecounts`)
 	if false {
