@@ -48,4 +48,17 @@ func (h *Handler) GetMessageCounts(c echo.Context) error {
 	return c.JSON(http.StatusOK, h.nowhavingdata[page*50:(page+1)*50])
 }
 
-//
+// グループ単位で読み取り
+// func (h *Handler) GetMessageCounts(c echo.Context) error {
+// 	//クエリパラメタでページ制御 50*page
+// 	pagestr := c.QueryParam("page")
+// 	if pagestr == "" {
+// 		return c.JSON(http.StatusOK, h.nowhavingdata)
+// 	}
+// 	page, err := strconv.Atoi(pagestr)
+// 	if err != nil {
+// 		return c.String(http.StatusBadRequest, err.Error())
+// 	}
+
+// 	return c.JSON(http.StatusOK, h.nowhavingdata[page*50:(page+1)*50])
+// }
