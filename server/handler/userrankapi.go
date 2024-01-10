@@ -228,7 +228,3 @@ func (h *Handler) MessageCountsBind(usetraqAPI bool) {
 	h.nowhavingdata = nowcollectingdata
 
 }
-
-//--------------------------------------------------------
-// チャンネル毎メッセージ数取得系
-//--------------------------------------------------------
