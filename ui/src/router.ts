@@ -5,6 +5,7 @@ import MessageRanking from './components/MessageRanking.vue'
 const routes = [
   { path: '/ping', name: 'ping', component: Ping },
   { path: '/message', name: 'message', component: MessageRanking },
+  { path: '/message/:groupid', name: 'message', component: MessageRanking },
 
 ]
 

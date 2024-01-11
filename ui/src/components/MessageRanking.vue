@@ -13,7 +13,7 @@ interface UserDetailWithMessageCount{
 const rankingDatas = ref<UserDetailWithMessageCount[]>()
 
 onMounted(async () => {
-  const res = await fetch('api/messages')
+  const res = await fetch(`api/messages/${this.route.params.groupid}`)
   if (res.ok) {
     rankingDatas.value = await res.json()
   }
