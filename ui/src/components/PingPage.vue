@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue'
 const pong = ref<string>('no data')
 
 onMounted(async () => {
-  const res = await fetch('api/ping')
+  const res = await fetch('/api/ping')
   if (res.ok) {
     pong.value = await res.text()
   }
