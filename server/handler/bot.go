@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -40,7 +41,27 @@ func (h *Handler) BotHandler() {
 		case 2:
 			message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
 			h.b.BotSimpleEdit(message, h.BotCollectUserRank(cmd[1]))
-
+		case 3:
+			if cmd[1] == "\\long" {
+				message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
+				_, content := h.b.BotGetLongMessages(cmd[2], 1000)
+				h.b.BotSimpleEdit(message, content)
+			} else {
+				h.b.BotSimplePost(p.Message.ChannelID, "Insert valid commands")
+			}
+		case 4:
+			if cmd[1] == "\\long" {
+				cmdint, err := strconv.Atoi(cmd[3])
+				if err != nil {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid commands")
+				} else {
+					message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
+					_, content := h.b.BotGetLongMessages(cmd[2], cmdint)
+					h.b.BotSimpleEdit(message, content)
+				}
+			} else {
+				h.b.BotSimplePost(p.Message.ChannelID, "Insert valid commands")
+			}
 		// case 2:
 		// 	switch cmd[1] {
 		// 	case "dbenroll":

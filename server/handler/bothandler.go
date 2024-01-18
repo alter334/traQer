@@ -50,3 +50,5 @@ func (h *Handler) BotCollectUserRank(groupName string) (x string) {
 	return res
 
 }
+
+
