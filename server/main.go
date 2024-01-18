@@ -85,7 +85,7 @@ func main() {
 	//cron動作確認
 	c.AddFunc("* * * * *", func() { log.Println("cron is running") })
 	//1日毎に全ユーザ読み込みを行う(データの補正,午前4時に実施 ただしNSはUTC)
-	//c.AddFunc("0 19 * * *", h.GetUserPostCount)
+	c.AddFunc("0 19 * * *", h.GetUserPostCount)
 	//5分ごとに差分読み取りを行う
 	c.AddFunc("0-59/5 * * * *", h.SearchMessagesRunner)
 	//1hごとにハンドラ内traQAPI関連情報更新
