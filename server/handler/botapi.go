@@ -113,6 +113,9 @@ func (b *BotHandler) BotGetLongMessages(username string, length int) (messageuui
 	ct := 0
 	maxlen := 0
 	userid := b.BotGetUserUUID(username) //uuidの取得
+	if userid==""{
+		return messageuuids, "Please insert valid username"
+	}
 	collections := ""                    //取得したメッセージのリンクと文字数を記録する
 	longmessages := []Messagewithlen{}
 	for i := 0; ; i += 100 {
