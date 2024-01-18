@@ -111,8 +111,9 @@ func (b *BotHandler) BotGetGroupMembers(groupid string) (groupmembersids []strin
 // user名から指定の文字数より長いメッセージのuuid配列とメッセージ内容を返す
 func (b *BotHandler) BotGetLongMessages(username string, length int) (messageuuids []string, content string) {
 	ct := 0
-	userid := b.BotGetUserUUID(username)
-	collections := "" //取得したメッセージのリンクと文字数を記録する
+	maxlen := 0
+	userid := b.BotGetUserUUID(username) //uuidの取得
+	collections := ""                    //取得したメッセージのリンクと文字数を記録する
 	longmessages := []Messagewithlen{}
 	for i := 0; ; i += 100 {
 		messages, err := b.BotGetUserMessages(userid, i)
@@ -125,6 +126,9 @@ func (b *BotHandler) BotGetLongMessages(username string, length int) (messageuui
 
 		for _, message := range messages.Hits {
 			len := utf8.RuneCountInString(message.Content)
+			if len > maxlen {
+				maxlen = len
+			}
 			if len >= length {
 				longmessages = append(longmessages, Messagewithlen{Len: len, Id: message.Id})
 				messageuuids = append(messageuuids, message.Id)
@@ -141,13 +145,14 @@ func (b *BotHandler) BotGetLongMessages(username string, length int) (messageuui
 
 	//メッセージの作成
 	for i, message := range longmessages {
-		collections += "https://q.trap.jp/messages/" + message.Id + "\n文字数:" + strconv.Itoa(message.Len) + "\n"
-		if i == 7 {
+		collections += "文字数:" + strconv.Itoa(message.Len) + "\n" + "https://q.trap.jp/messages/" + message.Id + "\n"
+		if i == 4 {
 			break
 		}
 	}
 	content += "## :@" + username + ": " + username + "の長文投稿一覧\n" +
-		"(指定された文字数:" + strconv.Itoa(length) + ",該当する投稿数:" + strconv.Itoa(ct) + ")\n" +
+		"(指定された文字数:" + strconv.Itoa(length) + ",該当する投稿数:" + strconv.Itoa(ct) +
+		",最大文字数:" + strconv.Itoa(maxlen) + ")\n" +
 		collections
 
 	return messageuuids, content
