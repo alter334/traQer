@@ -19,6 +19,7 @@ type UserDetailWithMessageCount struct {
 	Name              string `json:"name" db:"username"`
 	Homechannel       string `json:"homechannel" db:"homechannelid"`
 	TotalMessageCount int64  `json:"totalmessagecount" db:"totalpostcounts"`
+	DailyMessageCount int64  `json:"dailymessagecount" db:"dailypostcounts"`
 }
 
 // メッセージ取得用stract
