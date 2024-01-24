@@ -43,9 +43,6 @@ func (h *Handler) GetUserPostCount() {
 		message.TotalMessageCount = userStats.TotalMessageCount
 		userMessages = append(userMessages, message)
 		log.Println("traQing:", i, "mescount:", message.TotalMessageCount)
-		if i == 5 {
-			break
-		}
 	}
 
 	//収集完了時刻を最終調査時刻とする

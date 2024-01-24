@@ -81,6 +81,7 @@ func main() {
 	//SELECT EXISTS (SELECT * FROM `messagecounts`)
 	if true {
 		h.GetUserPostCount()
+		h.MessageCountsBind(true)
 	}
 
 	if os.Getenv("TEST_MODE") == "" {
