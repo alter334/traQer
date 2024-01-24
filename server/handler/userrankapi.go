@@ -61,7 +61,6 @@ func (h *Handler) GetUserPostCount() {
 			log.Println("Internal error:", err.Error())
 			return
 		}
-
 	}
 	//ハンドラに情報を持たせる
 	h.MessageCountsBind(false)
@@ -105,7 +104,11 @@ func (h *Handler) SearchMessagesRunner() {
 				break
 			}
 			messageCountperUser[message.UserId]++
-
+			_, err = h.db.Exec("INSERT INTO `recentmessages`(`messageid`,`channelid`,`userid`,`posttime`) VALUES(?,?,?,?)", message.GetId(), message.GetChannelId(), message.GetUserId())
+			if err != nil {
+				log.Println("Internal error:", err.Error())
+				return
+			}
 		}
 		if len(messages.Hits) < 100 {
 			break
