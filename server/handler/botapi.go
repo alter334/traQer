@@ -173,3 +173,7 @@ func (b *BotHandler) BotGetUserMessages(userid string, offset int) (message *tra
 	log.Println("取得mes:", messages.TotalHits)
 	return messages, nil
 }
+
+//------------------------------------------------
+// チャンネル監視関連
+//------------------------------------------------

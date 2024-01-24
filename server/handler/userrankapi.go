@@ -54,14 +54,13 @@ func (h *Handler) GetUserPostCount() {
 		return
 	}
 
-	//ユーザデータのdb反映
+	//ユーザデータのdb反映 1日の投稿数リセットはここ
 	for _, message := range userMessages {
-		_, err = h.db.Exec("INSERT INTO `messagecounts`(`totalpostcounts`,`userid`) VALUES(?,?) ON DUPLICATE KEY UPDATE `totalpostcounts`=VALUES(totalpostcounts)", message.TotalMessageCount, message.User.Id)
+		_, err = h.db.Exec("INSERT INTO `messagecounts`(`totalpostcounts`,`userid`,`dailypostcounts`) VALUES(?,?,?) ON DUPLICATE KEY UPDATE `totalpostcounts`=VALUES(totalpostcounts)", message.TotalMessageCount, message.User.Id, 0)
 		if err != nil {
 			log.Println("Internal error:", err.Error())
 			return
 		}
-
 	}
 	//ハンドラに情報を持たせる
 	h.MessageCountsBind(false)
@@ -104,8 +103,14 @@ func (h *Handler) SearchMessagesRunner() {
 			if message.Id == h.lastmessageuuid {
 				break
 			}
-			messageCountperUser[message.UserId]++
 
+			messageCountperUser[message.UserId]++
+			// メッセージ取得
+			_, err = h.db.Exec("INSERT INTO `recentmessages`(`messageid`,`channelid`,`userid`,`posttime`) VALUES(?,?,?,?)", message.GetId(), message.GetChannelId(), message.GetUserId(), message.CreatedAt)
+			if err != nil {
+				log.Println("Internal error:", err.Error())
+				return
+			}
 		}
 		if len(messages.Hits) < 100 {
 			break
@@ -124,7 +129,7 @@ func (h *Handler) SearchMessagesRunner() {
 	//mapに応じてsqlを発行
 	for userId, messageCount := range messageCountperUser {
 		log.Println("ユーザUUID:", userId, "実追加数:", messageCount)
-		_, err := h.db.Exec("INSERT INTO `messagecounts`(`totalpostcounts`,`userid`) VALUES(?,?) ON DUPLICATE KEY UPDATE `totalpostcounts`=`totalpostcounts`+VALUES(totalpostcounts)", messageCount, userId)
+		_, err := h.db.Exec("INSERT INTO `messagecounts`(`totalpostcounts`,`userid`,`dailypostcounts`) VALUES(?,?,?) ON DUPLICATE KEY UPDATE `totalpostcounts`=`totalpostcounts`+VALUES(totalpostcounts),`dailypostcounts`=`dailypostcounts`+VALUES(dailypostcounts)", messageCount, userId, messageCount)
 		if err != nil {
 			log.Println("Internal error:", err.Error())
 			return
@@ -217,7 +222,8 @@ func (h *Handler) MessageCountsBind(usetraqAPI bool) {
 				DisplayName:       userdetail.DisplayName,
 				Name:              userdetail.Name,
 				Homechannel:       home,
-				TotalMessageCount: int64(messageCount.TotalMessageCount)})
+				TotalMessageCount: int64(messageCount.TotalMessageCount),
+				DailyMessageCount: int64(messageCount.DailyMessageCount)})
 		// db更新
 		_, err = h.db.Exec("UPDATE `messagecounts` SET `displayname`=?, `username`=?, `homechannelid`=? WHERE `userid`=?", userdetail.DisplayName, userdetail.Name, home, userdetail.Id)
 		if err != nil {
