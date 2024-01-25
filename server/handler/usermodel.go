@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/traPtitech/go-traq"
 )
 
@@ -26,4 +28,12 @@ type UserDetailWithMessageCount struct {
 type MessageCountuuid struct {
 	Userid       string `json:"userid" db:"userid"`
 	MessageCount int    `json:"messagecount" db:"totalpostcounts"`
+}
+
+// 直近メッセージのid関連を読み取るstruct
+type RecentMessages struct {
+	Messageid string    `json:"messageid" db:"messageid"`
+	Userid    string    `json:"userid" db:"userid"`
+	Channelid string    `json:"channelid" db:"channelid"`
+	Posttime  time.Time `json:"posttime" db:"posttime"`
 }
