@@ -69,6 +69,8 @@ func main() {
 	}
 
 	h := handler.NewHandler(db, handler.NewBot(), client, auth, from, lasttrackmessageid)
+	fmt.Println("handlersetup")
+	log.Println(h.GetChannelNameWithParents("baaf247d-125a-47e4-82a8-ffcccab5f0b8",""))
 
 	c := cron.New() //定時実行用
 	e := echo.New()
