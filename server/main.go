@@ -70,41 +70,42 @@ func main() {
 
 	h := handler.NewHandler(db, handler.NewBot(), client, auth, from, lasttrackmessageid)
 
-	c := cron.New() //定時実行用
-	e := echo.New()
-	go h.BotHandler()
+	if false {
+		c := cron.New() //定時実行用
+		e := echo.New()
+		go h.BotHandler()
 
-	//再起動でデータ取得
-	//ハンドラに情報を持たせる
-	h.MessageCountsBind(false)
+		//再起動でデータ取得
+		//ハンドラに情報を持たせる
+		h.MessageCountsBind(false)
 
-	//SELECT EXISTS (SELECT * FROM `messagecounts`)
-	if true {
-		h.GetUserPostCount()
+		//SELECT EXISTS (SELECT * FROM `messagecounts`)
+		if true {
+			h.GetUserPostCount()
+		}
+
+		if os.Getenv("TEST_MODE") == "" {
+			log.Println("Full Collect Mode")
+			//1日毎に全ユーザ読み込みを行う(データの補正,午前4時に実施 ただしNSはUTC)
+			c.AddFunc("0 19 * * *", h.GetUserPostCount)
+			//1hごとにハンドラ内traQAPI関連情報更新
+			c.AddFunc("58 * * * *", func() { h.MessageCountsBind(true) })
+		}
+		//5分ごとに差分読み取りを行う
+		c.AddFunc("0-59/5 * * * *", h.SearchMessagesRunner)
+
+		c.Start()
+
+		time.Sleep(time.Second * 2) //cronスタート用
+
+		e.Use(middleware.Logger())
+		e.Use(middleware.Recover())
+
+		e.GET("/ping", func(c echo.Context) error { return c.String(http.StatusOK, "pong") })
+		e.GET("/alter", func(c echo.Context) error { return c.String(http.StatusOK, "pong") })
+		e.GET("/messages", h.GetMessageCounts)
+		e.GET("/messages/:groupid", h.GetMessageCountsWithGroup)
+
+		e.Logger.Fatal(e.Start(":8080"))
 	}
-
-	if os.Getenv("TEST_MODE") == "" {
-		log.Println("Full Collect Mode")
-		//1日毎に全ユーザ読み込みを行う(データの補正,午前4時に実施 ただしNSはUTC)
-		c.AddFunc("0 19 * * *", h.GetUserPostCount)
-		//1hごとにハンドラ内traQAPI関連情報更新
-		c.AddFunc("58 * * * *", func() { h.MessageCountsBind(true) })
-	}
-	//5分ごとに差分読み取りを行う
-	c.AddFunc("0-59/5 * * * *", h.SearchMessagesRunner)
-
-	c.Start()
-
-	time.Sleep(time.Second * 2) //cronスタート用
-
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
-	e.GET("/ping", func(c echo.Context) error { return c.String(http.StatusOK, "pong") })
-	e.GET("/alter", func(c echo.Context) error { return c.String(http.StatusOK, "pong") })
-	e.GET("/messages", h.GetMessageCounts)
-	e.GET("/messages/:groupid", h.GetMessageCountsWithGroup)
-
-	e.Logger.Fatal(e.Start(":8080"))
-
 }

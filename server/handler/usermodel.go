@@ -37,3 +37,8 @@ type RecentMessages struct {
 	Channelid string    `json:"channelid" db:"channelid"`
 	Posttime  time.Time `json:"posttime" db:"posttime"`
 }
+
+type RecentMessageCountbyChannel struct {
+	Channelid string `json:"channelid" db:"channelid"`
+	Count     int    `json:"count" db:"COUNT(*)"`
+}
