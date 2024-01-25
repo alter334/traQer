@@ -79,7 +79,7 @@ func main() {
 	h.MessageCountsBind(false)
 
 	//SELECT EXISTS (SELECT * FROM `messagecounts`)
-	if true {
+	if false {
 		h.GetUserPostCount()
 		h.MessageCountsBind(true)
 	}
