@@ -38,7 +38,13 @@ type RecentMessages struct {
 	Posttime  time.Time `json:"posttime" db:"posttime"`
 }
 
+// メッセージflow用
 type RecentMessageCountbyChannel struct {
 	Channelid string `json:"channelid" db:"channelid"`
 	Count     int    `json:"count" db:"COUNT(*)"`
+}
+
+type DMSubscriber struct {
+	Userid           string `json:"userid" db:"userid"`
+	NotifyFlowAmount int    `json:"notifyflowamount" db:"notifyflowamount"`
 }
