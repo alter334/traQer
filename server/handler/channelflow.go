@@ -16,6 +16,7 @@ func (h *Handler) RecentMessageCollector(since time.Duration) ([]RecentMessageCo
 		return messagecounts, err
 	}
 	log.Println("Success:", len(messagecounts))
+	h.SendingDMs(messagecounts)
 	return messagecounts, nil
 }
 
@@ -45,8 +46,13 @@ func (h *Handler) SendingDMs(messagecounts []RecentMessageCountbyChannel) {
 				"(https://q.trap.jp/channels/" + channelname + ") " +
 				"15min投稿数:" + strconv.Itoa(messagecounts[i].Count) + "\n"
 			i++
+			if i == len(messagecounts) {
+				break
+			}
 		}
-		h.b.BotDM(s.Userid, content)
+		if content != "" {
+			h.b.BotDM(s.Userid, content)
+		}
 	}
 
 }

@@ -70,7 +70,7 @@ func main() {
 
 	h := handler.NewHandler(db, handler.NewBot(), client, auth, from, lasttrackmessageid)
 	fmt.Println("handlersetup")
-	log.Println(h.GetChannelNameWithParents("baaf247d-125a-47e4-82a8-ffcccab5f0b8",""))
+	log.Println(h.GetChannelNameWithParents("baaf247d-125a-47e4-82a8-ffcccab5f0b8", ""))
 
 	c := cron.New() //定時実行用
 	e := echo.New()
@@ -94,10 +94,12 @@ func main() {
 	}
 	//5分ごとに差分読み取りを行う
 	c.AddFunc("0-59/5 * * * *", h.SearchMessagesRunner)
+	//5分ごとに流速通知
+	c.AddFunc("2-59/5 * * * *", func() { h.RecentMessageCollector(15 * time.Minute) })
 
 	c.Start()
 
-	time.Sleep(time.Second * 2) //cronスタート用
+	time.Sleep(time.Second * 5) //cronスタート用
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
