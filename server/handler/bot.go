@@ -30,6 +30,7 @@ func (h *Handler) BotHandler() {
 	})
 
 	h.b.bot.OnMessageCreated(func(p *payload.MessageCreated) {
+		h.b.BotDM("97d954a2-695b-466d-9d94-cf4ad88dd262", "test")
 		log.Println("Received MESSAGE_CREATED event: " + p.Message.Text)
 		cmd := strings.Fields(p.Message.Text)
 
