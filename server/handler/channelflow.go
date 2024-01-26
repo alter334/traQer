@@ -64,7 +64,7 @@ func (h *Handler) SendingDMs(messagecounts []RecentMessageCountbyChannel) {
 			}
 			// とりあえずは15分のみ対応
 			content += "|**[#" + channelname + "]" +
-				"(https://q.trap.jp/channels/" + channelname + ")|**" +
+				"(https://q.trap.jp/channels/" + channelname + ")**|**" +
 				strconv.Itoa(messagecounts[i].Count) + "**|\n"
 			i++
 			if i == len(messagecounts) {
@@ -72,7 +72,8 @@ func (h *Handler) SendingDMs(messagecounts []RecentMessageCountbyChannel) {
 			}
 		}
 		if content != "" {
-			contentsend := "|チャンネル|投稿数/15分|\n|---|---|\n" + content
+			contentsend := "## 直近15分の流速案内\n|チャンネル|投稿数/15分|\n|---|---|\n" + content+
+			"現在の基準流速:"+strconv.Itoa(s.NotifyFlowAmount)+" `@BOT_traQer \\dm\\enroll\\{値}`で変更可"
 			h.b.BotDM(s.Userid, contentsend)
 		}
 	}
