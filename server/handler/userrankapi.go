@@ -56,7 +56,7 @@ func (h *Handler) GetUserPostCount() {
 
 	//ユーザデータのdb反映 1日の投稿数リセットはここ
 	for _, message := range userMessages {
-		_, err = h.db.Exec("INSERT INTO `messagecounts`(`totalpostcounts`,`userid`,`dailypostcounts`) VALUES(?,?,?) ON DUPLICATE KEY UPDATE `totalpostcounts`=VALUES(totalpostcounts)", message.TotalMessageCount, message.User.Id, 0)
+		_, err = h.db.Exec("INSERT INTO `messagecounts`(`totalpostcounts`,`userid`,`dailypostcounts`) VALUES(?,?,0) ON DUPLICATE KEY UPDATE `totalpostcounts`=VALUES(totalpostcounts),`dailypostcounts`=0", message.TotalMessageCount, message.User.Id)
 		if err != nil {
 			log.Println("Internal error:", err.Error())
 			return
