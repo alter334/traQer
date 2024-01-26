@@ -17,7 +17,23 @@ func (h *Handler) RecentMessageCollector(since time.Duration) ([]RecentMessageCo
 	}
 	log.Println("Success:", len(messagecounts))
 	h.SendingDMs(messagecounts)
+	err = h.DeleteRecentMessageDB()
+	if err != nil {
+		return messagecounts, err
+	}
 	return messagecounts, nil
+}
+
+// 25h以前のメッセージ履歴の消去
+func (h *Handler) DeleteRecentMessageDB() error {
+	q, err := h.db.Exec("DELETE FROM `recentmessages` WHERE `posttime` < TIMESTAMPADD(HOUR,-25,UTC_TIMESTAMP())")
+	if err != nil {
+		log.Println("Error delete recent messages:", err.Error())
+	} else {
+		delnum, _ := q.RowsAffected()
+		log.Println("Success:", delnum)
+	}
+	return err
 }
 
 // DM配信
@@ -42,16 +58,17 @@ func (h *Handler) SendingDMs(messagecounts []RecentMessageCountbyChannel) {
 				return
 			}
 			// とりあえずは15分のみ対応
-			content += "### チャンネル: [#" + channelname + "]" +
-				"(https://q.trap.jp/channels/" + channelname + ") " +
-				"15min投稿数:" + strconv.Itoa(messagecounts[i].Count) + "\n"
+			content += "|**[#" + channelname + "]" +
+				"(https://q.trap.jp/channels/" + channelname + ")|**" +
+				strconv.Itoa(messagecounts[i].Count) + "**|\n"
 			i++
 			if i == len(messagecounts) {
 				break
 			}
 		}
 		if content != "" {
-			h.b.BotDM(s.Userid, content)
+			contentsend := "|チャンネル|投稿数/15分|\n|---|---|\n" + content
+			h.b.BotDM(s.Userid, contentsend)
 		}
 	}
 
