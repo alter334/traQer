@@ -73,7 +73,7 @@ func (h *Handler) SendingDMs(messagecounts []RecentMessageCountbyChannel) {
 		}
 		if content != "" {
 			contentsend := "## 直近15分の流速案内\n|チャンネル|投稿数/15分|\n|---|---|\n" + content+
-			"\n現在の基準流速:"+strconv.Itoa(s.NotifyFlowAmount)+" `@BOT_traQer \\dm\\enroll\\{値}`で変更可"
+			"\n現在の基準流速:"+strconv.Itoa(s.NotifyFlowAmount)+" `@BOT_traQer \\dm\\enroll {値}`で変更可"
 			h.b.BotDM(s.Userid, contentsend)
 		}
 	}
