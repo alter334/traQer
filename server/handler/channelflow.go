@@ -16,7 +16,9 @@ func (h *Handler) RecentMessageCollector(since time.Duration) ([]RecentMessageCo
 		return messagecounts, err
 	}
 	log.Println("Success:", len(messagecounts))
-	h.SendingDMs(messagecounts)
+	if len(messagecounts) != 0 {
+		h.SendingDMs(messagecounts)
+	}
 	return messagecounts, nil
 }
 
