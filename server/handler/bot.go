@@ -39,10 +39,28 @@ func (h *Handler) BotHandler() {
 			message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
 			h.b.BotSimpleEdit(message, h.BotCollectUserRank(""))
 		case 2:
+			if cmd[1] == "\\dm\\enroll" {
+				h.b.BotDM(p.Message.User.ID, h.BotDMSubscribe(p.Message.User.ID, 10))
+				h.b.BotSimplePost(p.Message.ChannelID, "DMに詳細を送付しました")
+				break
+			} else if cmd[1] == "\\dm\\unsubscribe" {
+				h.b.BotDM(p.Message.User.ID, h.BotDMUnSubscribe(p.Message.User.ID))
+				h.b.BotSimplePost(p.Message.ChannelID, "DMに詳細を送付しました")
+				break
+			}
 			message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
 			h.b.BotSimpleEdit(message, h.BotCollectUserRank(cmd[1]))
 		case 3:
-			if cmd[1] == "\\long" {
+			if cmd[1] == "\\dm\\enroll" {
+				amount, err := strconv.Atoi(cmd[2])
+				if err != nil || amount < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid number")
+					break
+				}
+				h.b.BotDM(p.Message.User.ID, h.BotDMSubscribe(p.Message.User.ID, amount))
+				h.b.BotSimplePost(p.Message.ChannelID, "DMに詳細を送付しました")
+
+			} else if cmd[1] == "\\long" {
 				message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
 				_, content := h.b.BotGetLongMessages(cmd[2], 1000)
 				h.b.BotSimpleEdit(message, content)

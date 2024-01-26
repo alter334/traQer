@@ -47,6 +47,23 @@ func (b *BotHandler) BotSimpleEdit(messageid string, content string) {
 }
 
 //----------------------------------------------------------------
+// DM送信
+//----------------------------------------------------------------
+
+func (b *BotHandler) BotDM(userid string, content string) {
+	_, r, err := b.bot.API().
+		MessageApi.
+		PostDirectMessage(context.Background(), userid).
+		PostMessageRequest(traq.PostMessageRequest{
+			Content: content,
+		}).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+}
+
+//----------------------------------------------------------------
 // traQAPI叩く系
 //----------------------------------------------------------------
 
@@ -113,10 +130,10 @@ func (b *BotHandler) BotGetLongMessages(username string, length int) (messageuui
 	ct := 0
 	maxlen := 0
 	userid := b.BotGetUserUUID(username) //uuidの取得
-	if userid==""{
+	if userid == "" {
 		return messageuuids, "Please insert valid username"
 	}
-	collections := ""                    //取得したメッセージのリンクと文字数を記録する
+	collections := "" //取得したメッセージのリンクと文字数を記録する
 	longmessages := []Messagewithlen{}
 	for i := 0; ; i += 100 {
 		messages, err := b.BotGetUserMessages(userid, i)
