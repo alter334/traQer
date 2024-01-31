@@ -1,0 +1,117 @@
+openapi: 3.0.3
+info:
+  title: traQer
+  description: Information about traQ usage
+  version: 0.0.5
+externalDocs:
+  description: 仕様書
+  url: https://md.trap.jp/9uTJhTIRS-WbUzdtRM2-5Q
+servers:
+  - url: https://yaranai.trap.show/api
+tags:
+  - name: user
+    description: ユーザ紐付き情報
+
+paths:
+  /ping:
+    get:
+      tags:
+        - user
+      summary: 疎通を確認
+      description: 疎通を確認するためのものエンドポイント
+      operationId: ping
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ping"
+  
+  
+  
+  
+components:
+  schemas:
+    ping:
+      type: string
+      example: pong
+    taskWithoutId:
+      type: object
+      required:
+        - title
+        - description
+        - condition
+        - difficulty
+        - dueDate
+      properties:
+        title:
+          type: string
+          example: 単位認定の申請
+        description:
+          type: string
+          example: スコアレポートを教務課に提出する
+        condition:
+          type: integer
+          example: 2
+          description: タスクが出来る状況の状況ID(デフォルト=いつでもできるタスクは0)
+        difficulty:
+          type: integer
+          example: 2
+          description: "1:気軽にできる, 2: 普通, 3: ハードルが高い"
+        dueDate:
+          type: string
+          format: date
+          example: 2021-01-01
+    task:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - condition
+        - difficulty
+        - dueDate
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: 単位認定の申請
+        description:
+          type: string
+          example: スコアレポートを教務課に提出する
+        condition:
+          type: integer
+          example: 2
+          description: タスクが出来る状況の状況ID(デフォルト=いつでもできるタスクは0)
+        difficulty:
+          type: integer
+          example: 2
+          description: "1:気軽にできる, 2: 普通, 3: ハードルが高い"
+        dueDate:
+          type: string
+          format: date
+          example: 2021-01-01
+    tasks:
+      type: array
+      items:
+        $ref: "#/components/schemas/task"
+    condition:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: どこでもできる
+    conditions:
+      type: array
+      items:
+        $ref: "#/components/schemas/condition"
+      
