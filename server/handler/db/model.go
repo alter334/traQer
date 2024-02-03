@@ -1,0 +1,7 @@
+package db
+
+import traqwsbot "github.com/traPtitech/traq-ws-bot"
+
+type Bot struct {
+	bot *traqwsbot.Bot
+}
