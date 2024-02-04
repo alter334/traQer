@@ -1,7 +1,9 @@
 package db
 
-import traqwsbot "github.com/traPtitech/traq-ws-bot"
+import (
+	"github.com/jmoiron/sqlx"
+)
 
-func NewBotHandler(bot *traqwsbot.Bot) *Bot {
-	return &Bot{bot: bot}
+func NewDBHandler(db *sqlx.DB) *DB {
+	return &DB{db: db}
 }

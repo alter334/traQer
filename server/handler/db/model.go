@@ -1,7 +1,7 @@
 package db
 
-import traqwsbot "github.com/traPtitech/traq-ws-bot"
+import "github.com/jmoiron/sqlx"
 
-type Bot struct {
-	bot *traqwsbot.Bot
+type DB struct {
+	db *sqlx.DB
 }

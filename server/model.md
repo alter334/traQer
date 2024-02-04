@@ -10,18 +10,17 @@
 ### Server
 ```
 type Server struct{
-  bot *Bot // Bot関連
-  db *DB // db関連
-  service *Service // 具体的機能
-  traQapi *traQapi // traqApi関連
+  bot *bot.Bot // Bot関連
+  db *db.DB // db関連
+  qapi *qapi.Qapi // traqApi関連
   serverData ServerData // 保持しておくデータ
 }
 ```
 
-### ServerData
+### serverData
 ```
-type ServerData struct {
-  lastTrackId traq.Message // 最後に取得したメッセージ
+type serverData struct {
+  lastTrackMessage traq.Message // 最後に取得したメッセージ
   lastTrackTime time.Time // 最後の取得日時
   // 増えたらここに書く
 }
@@ -43,7 +42,7 @@ type DB struct{
 
 ### traQapi
 ```
-type traQapi struct {
+type Qapi struct {
   auth context.Context // 認証関連
   client *traq.APIClient // traqAPIClient
 }
