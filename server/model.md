@@ -55,17 +55,35 @@ type Qapi struct {
 
 
 
-## struct関連
+## Service関連
 - メソッドは略
 - 各パッケージにhandler.goを用意しそこにインスタンス化を定義 model.goも用意
 
-### Server
+### Service
 ```
-type Server struct{
-  bot *bot.Bot // Bot関連
-  db *db.DB // db関連
-  qapi *qapi.Qapi // traqApi関連
-  serverData ServerData // 保持しておくデータ
+type Service struct{
+  User *user.UserHandler
+  Channel *channel.ChannelHandler
+  Stamp *stamp.StampHandler
+}
+```
+
+### UserHandler
+```
+type UserHandler struct{
+  Userdata userdata
+}
+```
+
+### ChannelHandler
+```
+type ChannelHandler struct{
+}
+```
+
+### StampHandler
+```
+type StampHandler struct{
 }
 ```
 
