@@ -4,13 +4,20 @@
 - [readme](../README.md)参照
 ![](../IMG_7693.jpeg)
 
+### 命名規則
+- パッケージ名は全て小文字
+- ハンドラ名,struct名はパスカルケース
+- 変数名はキャメルケース
+- メソッド名はパスカルケース
+- DB,API等の略語はパッケージ名の時以外は大文字とする
+
 ## Botパッケージ
 - botのコマンドやbotからのサーバへのアクセスを管理
 - 他のパッケージからは独立したものとして扱う(他のパッケージのメソッドにBotパッケージの関数は入らない)
-  - Botからサーバのメソッドを呼び出すイメージとしてはservice.User.Hoge()みたいな感じで書くことになりそう
-  - Service系パッケージ内にはあくまでBOT出力用の関数が生える感じ
+  - Botからサーバのメソッドを呼び出す イメージとしては`service.User.BotHoge()`のように記述する
+  - Service系パッケージ内にBOTから呼び出されるメソッドを実装する
 
-### BOT
+### Bot
 ```
 type Bot struct {
   bot *traqwsbot.Bot // traqBot
@@ -21,12 +28,23 @@ type Bot struct {
 - db,qapiパッケージを格納するパッケージ
 - 設計上は最下層の一つ上に位置する
 - サーバの各サービスごとにインスタンス化(?)される
+- サーバの持つデータもここに格納され、そのデータを読み取るメソッドが生やされる
 
 ### API
 ```
-type API struct{
+type ApiHandler struct{
   db *db.DB // db関連
   qapi *qapi.Qapi // traqApi関連
+  serverData ServerData // サーバの持つデータ
+}
+```
+
+### serverData
+```
+type serverData struct {
+  lastTrackMessage traq.Message // 最後に取得したメッセージ
+  lastTrackTime time.Time // 最後の取得日時
+  // 増えたらここに書く
 }
 ```
 
@@ -72,6 +90,7 @@ type Service struct{
 ```
 type UserHandler struct{
   Userdata userdata
+  Api *api.APIHandler
 }
 ```
 
@@ -87,14 +106,7 @@ type StampHandler struct{
 }
 ```
 
-### serverData
-```
-type serverData struct {
-  lastTrackMessage traq.Message // 最後に取得したメッセージ
-  lastTrackTime time.Time // 最後の取得日時
-  // 増えたらここに書く
-}
-```
+
 
 
 
