@@ -39,9 +39,9 @@ type ApiHandler struct{
 }
 ```
 
-### serverData
+### ServerData
 ```
-type serverData struct {
+type ServerData struct {
   lastTrackMessage traq.Message // 最後に取得したメッセージ
   lastTrackTime time.Time // 最後の取得日時
   // 増えたらここに書く
@@ -73,7 +73,7 @@ type Qapi struct {
 
 
 
-## Service関連
+## Serviceパッケージ
 - メソッドは略
 - 各パッケージにhandler.goを用意しそこにインスタンス化を定義 model.goも用意
 
@@ -85,11 +85,11 @@ type Service struct{
   Stamp *stamp.StampHandler
 }
 ```
+## Userパッケージ
 
 ### UserHandler
 ```
 type UserHandler struct{
-  Userdata userdata
   Api *api.APIHandler
 }
 ```
@@ -97,16 +97,30 @@ type UserHandler struct{
 ### ChannelHandler
 ```
 type ChannelHandler struct{
+  Api *api.APIHandler
 }
 ```
 
 ### StampHandler
 ```
 type StampHandler struct{
+  Api *api.APIHandler
 }
 ```
 
+## setupパッケージ
+- bot,serviceの起動を行う(Handlerの設定)
+- cronの設定,echoの設定を行う
 
+### Setup
+```
+type Setup struct{
+  bot *bot.Bot
+  service *service.Service
+}
+```
 
+## mainパッケージ
+- 実行用
 
 
