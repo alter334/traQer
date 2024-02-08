@@ -6,7 +6,7 @@ import (
 	"github.com/traPtitech/go-traq"
 )
 
-type Qapi struct {
+type QapiHandler struct {
 	auth   context.Context
 	client *traq.APIClient
 }

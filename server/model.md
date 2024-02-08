@@ -33,8 +33,8 @@ type Bot struct {
 ### API
 ```
 type ApiHandler struct{
-  db *db.DB // db関連
-  qapi *qapi.Qapi // traqApi関連
+  db *db.DBHandler // db関連
+  qapi *qapi.QapiHandler // traqApi関連
   serverData ServerData // サーバの持つデータ
 }
 ```
@@ -52,9 +52,9 @@ type ServerData struct {
 - dbのセットアップ及びdb操作をするメソッドの集まったパッケージ
 - 設計上の最下層
 
-### DB
+### DBHandler
 ```
-type DB struct{
+type DBHandler struct{
   db *sqlx.DB // sqlx.db
 }
 ```
@@ -63,9 +63,9 @@ type DB struct{
 - traQのAPIラッパーを用いてAPIを叩くメソッドの集まったパッケージ
 - 設計上の最下層
 
-### Qapi
+### QapiHandler
 ```
-type Qapi struct {
+type QapiHandler struct {
   auth context.Context // 認証関連
   client *traq.APIClient // traqAPIClient
 }
@@ -90,21 +90,21 @@ type Service struct{
 ### UserHandler
 ```
 type UserHandler struct{
-  Api *api.APIHandler
+  Api *api.ApiHandler
 }
 ```
 
 ### ChannelHandler
 ```
 type ChannelHandler struct{
-  Api *api.APIHandler
+  Api *api.ApiHandler
 }
 ```
 
 ### StampHandler
 ```
 type StampHandler struct{
-  Api *api.APIHandler
+  Api *api.ApiHandler
 }
 ```
 

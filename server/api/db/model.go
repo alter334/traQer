@@ -2,6 +2,6 @@ package db
 
 import "github.com/jmoiron/sqlx"
 
-type DB struct {
+type DBHandler struct {
 	db *sqlx.DB
 }
