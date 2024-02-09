@@ -114,7 +114,7 @@ type StampHandler struct{
 
 ### Setup
 ```
-type Setup struct{
+type Server struct{
   bot *bot.Bot
   service *service.Service
 }
