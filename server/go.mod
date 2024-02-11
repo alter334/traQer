@@ -7,6 +7,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo v3.3.10+incompatible
+	github.com/robfig/cron v1.2.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/traPtitech/go-traq v0.0.0-20230720010114-3bada4b8a73a
 	github.com/traPtitech/traq-ws-bot v1.1.2
