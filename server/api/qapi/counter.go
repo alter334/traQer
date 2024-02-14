@@ -1,7 +1,11 @@
 package qapi
 
-import "log"
+import (
+	"log"
+	"traQer/model"
+)
 
+// traQAPI(/users/{userid}/stats)を叩きまくる *高負荷かつ長時間
 func (q *QapiHandler) GetUserPostCount() {
 
 	//ユーザリスト取得
@@ -14,8 +18,10 @@ func (q *QapiHandler) GetUserPostCount() {
 
 	log.Println("Userlistavailable:", len(v))
 
-	var userMessages []UserMessages
+	// traqAPIのUser型に対応したstructに
+	var userMessages []model.QUserMessages
 
+	// BOTは排除
 	for i, user := range v {
 		if user.Bot {
 			log.Println("isBot:", i)
@@ -26,7 +32,7 @@ func (q *QapiHandler) GetUserPostCount() {
 			log.Println("Internal error-Qapi error:", err.Error())
 			return
 		}
-		var message UserMessages
+		var message model.QUserMessages
 		message.User = user
 		message.TotalMessageCount = userStats.TotalMessageCount
 
@@ -34,5 +40,8 @@ func (q *QapiHandler) GetUserPostCount() {
 		log.Println("traQing:", i, "mescount:", message.TotalMessageCount)
 	}
 
-	
+}
+
+func (q *QapiHandler) GetUserDetails() *model.UserDetailWithMessageCount{
+	return nil
 }

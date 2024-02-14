@@ -1,11 +1,4 @@
-package user
-
-import "traQer/api"
-
-// Handler
-type UserHandler struct {
-	api *api.ApiHandler
-}
+package model
 
 // 取得したメッセージを詳細にstract
 type UserDetailWithMessageCount struct {

@@ -7,6 +7,11 @@ import (
 	"github.com/traPtitech/go-traq"
 )
 
+type QapiHandler struct {
+	auth   context.Context
+	client *traq.APIClient
+}
+
 func NewQapiHandler(auth context.Context, client *traq.APIClient) *QapiHandler {
 	return &QapiHandler{auth: auth, client: client}
 }

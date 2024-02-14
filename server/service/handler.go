@@ -6,6 +6,11 @@ import (
 	"traQer/service/user"
 )
 
+type Service struct {
+	user    *user.UserHandler
+	channel *channel.ChannelHandler
+}
+
 func NewService(user *user.UserHandler, channel *channel.ChannelHandler) *Service {
 	return &Service{user: user, channel: channel}
 }
