@@ -216,6 +216,16 @@ func (h *Handler) MessageCountsBind(usetraqAPI bool) {
 			log.Println("Internal error:", err.Error())
 			return
 		}
+		if userstate := userdetail.GetState(); userstate == 0 {
+			//凍結ユーザのdb削除
+			// db更新
+			_, err = h.db.Exec("DELETE FROM `messagecounts` WHERE `userid`=?", userdetail.Id)
+			if err != nil {
+				log.Println("Internal error:", err.Error())
+				return
+			}
+			continue
+		}
 		home := userdetail.GetHomeChannel()
 		nowcollectingdata = append(nowcollectingdata,
 			UserDetailWithMessageCount{Id: userdetail.Id,
