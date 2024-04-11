@@ -43,9 +43,6 @@ func (h *Handler) GetUserPostCount() {
 		message.TotalMessageCount = userStats.TotalMessageCount
 		userMessages = append(userMessages, message)
 		log.Println("traQing:", i, "mescount:", message.TotalMessageCount)
-		if i == 5 {
-			break
-		}
 	}
 
 	//収集完了時刻を最終調査時刻とする
@@ -59,7 +56,7 @@ func (h *Handler) GetUserPostCount() {
 
 	//ユーザデータのdb反映 1日の投稿数リセットはここ
 	for _, message := range userMessages {
-		_, err = h.db.Exec("INSERT INTO `messagecounts`(`totalpostcounts`,`userid`,`dailypostcounts`) VALUES(?,?,?) ON DUPLICATE KEY UPDATE `totalpostcounts`=VALUES(totalpostcounts)", message.TotalMessageCount, message.User.Id, 0)
+		_, err = h.db.Exec("INSERT INTO `messagecounts`(`totalpostcounts`,`userid`,`dailypostcounts`) VALUES(?,?,0) ON DUPLICATE KEY UPDATE `totalpostcounts`=VALUES(totalpostcounts),`dailypostcounts`=0", message.TotalMessageCount, message.User.Id)
 		if err != nil {
 			log.Println("Internal error:", err.Error())
 			return
