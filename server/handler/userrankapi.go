@@ -224,6 +224,7 @@ func (h *Handler) MessageCountsBind(usetraqAPI bool) {
 				log.Println("Internal error:", err.Error())
 				return
 			}
+			log.Println("User deleted:", userdetail.Name)
 			continue
 		}
 		home := userdetail.GetHomeChannel()

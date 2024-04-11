@@ -78,7 +78,7 @@ func main() {
 
 	//再起動でデータ取得
 	//ハンドラに情報を持たせる
-	h.MessageCountsBind(false)
+	h.MessageCountsBind(true)
 
 	//SELECT EXISTS (SELECT * FROM `messagecounts`)
 	if false {
