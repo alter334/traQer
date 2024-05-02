@@ -106,7 +106,7 @@ func (h *Handler) SearchMessagesRunner() {
 
 			messageCountperUser[message.UserId]++
 			// メッセージ取得
-			_, err = h.db.Exec("INSERT INTO `recentmessages`(`messageid`,`channelid`,`userid`,`posttime`) VALUES(?,?,?,?)", message.GetId(), message.GetChannelId(), message.GetUserId(), message.CreatedAt)
+			_, err = h.db.Exec("INSERT INTO `recentmessages`(`messageid`,`channelid`,`userid`,`posttime`) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE `channelid`=VALUES(channelid),`userid`=VALUES(userid),`posttime`=VALUES(posttime)", message.GetId(), message.GetChannelId(), message.GetUserId(), message.CreatedAt)
 			if err != nil {
 				log.Println("Internal error:", err.Error())
 				return
