@@ -310,7 +310,7 @@ func (b *BotHandler) BotGetUserMessages(userid string, offset int) (message *tra
 // 指定したチャンネルからメッセージを100件取得する
 func (b *BotHandler) BotGetChannelMessages(channelid string, offset int) (message *traq.MessageSearchResult, err error) {
 	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
-		In(channelid).Limit(100).Offset(int32(offset)).
+		In(channelid).Limit(10).Offset(int32(offset)).
 		Sort(`createdAt`).Execute()
 	if err != nil {
 		return messages, err
@@ -323,7 +323,7 @@ func (b *BotHandler) BotGetChannelMessages(channelid string, offset int) (messag
 // 引用ありのみ
 func (b *BotHandler) BotGetChannelMessagesWithQuote(channelid string, offset int) (message *traq.MessageSearchResult, err error) {
 	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
-		In(channelid).Limit(100).Offset(int32(offset)).HasURL(true).
+		In(channelid).Limit(10).Offset(int32(offset)).HasURL(true).
 		Sort(`createdAt`).Execute()
 	if err != nil {
 		return messages, err
