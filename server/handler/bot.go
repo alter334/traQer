@@ -47,6 +47,8 @@ func (h *Handler) BotHandler() {
 				h.b.BotDM(p.Message.User.ID, h.BotDMUnSubscribe(p.Message.User.ID))
 				h.b.BotSimplePost(p.Message.ChannelID, "DMに詳細を送付しました")
 				break
+			} else if cmd[1] == ":w:" {
+				h.b.BotWUserrank("", "", p.Message.ChannelID)
 			}
 			message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
 			h.b.BotSimpleEdit(message, h.BotCollectUserRank(cmd[1]))

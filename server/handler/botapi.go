@@ -7,6 +7,8 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/traPtitech/go-traq"
@@ -75,6 +77,16 @@ func (b *BotHandler) BotGetUserName(postUserID string) (userName string) {
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
 	}
 	return userdetail.GetName()
+}
+
+// MessageをUUIDから返す
+func (b *BotHandler) BotGetMessage(messageuuid string) (message *traq.Message) {
+	message, httpres, err := b.bot.API().MessageApi.GetMessage(context.Background(), messageuuid).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
+	}
+	return message
 }
 
 // user名からユーザUUIDを取得
@@ -178,6 +190,93 @@ func (b *BotHandler) BotGetLongMessages(username string, length int) (messageuui
 	return messageuuids, content
 }
 
+// 収集したメッセージ群から情報を求める
+func (b *BotHandler) BotWUserrank(after string, before string, channeltopost string) string {
+
+	messageCountperUser := map[string]int{}                  //ランキング用mapの生成
+	response := "searching... :loading:"                     //結果表示用文字列
+	responseuuid := b.BotSimplePost(channeltopost, response) //返信用メッセージの作成
+	channelid := "5b7b8143-7c0d-4ade-8658-3a8d8ce4dd83"      //gps/trend/w のチャンネルid
+	botpikatestid := b.BotGetUserUUID("BOT_pika_test")       //BOT_pika_testのユーザid
+	if after == "" {
+		after = "20200101" //空白処理
+	}
+	if before == "" {
+		before = time.Now().Format("20060102") //空白処理
+	}
+
+	aftertime, err := time.Parse("20060102", after)
+	if err != nil {
+		return "ATime parsing Error:" + err.Error()
+	}
+	beforetime, err := time.Parse("20060102", before)
+	if err != nil {
+		return "BTime parsing Error:" + err.Error()
+	}
+
+	for i := 0; ; i += 100 {
+		messages, err := b.BotGetChannelMessagesWithQuote(channelid, i)
+		if err != nil {
+			return "Polling Error:" + err.Error()
+		}
+
+		// 受信したメッセージの読み取り 規定条件を満たすか確認
+		// "URL数が10","Bot_pika_testによるもの","指定日付以前以降"
+
+		for _, message := range messages.Hits {
+			if message.UserId != botpikatestid {
+				continue
+			}
+			if !message.CreatedAt.After(aftertime) {
+				break
+			}
+			if !message.CreatedAt.Before(beforetime) {
+				continue
+			}
+			urls := strings.Fields(message.Content)
+			if len(urls) != 10 {
+				continue
+			}
+
+			//メッセージの取り出しと集計
+			for _, messageurl := range urls {
+				messageuuid := strings.Split(messageurl, "/")[4]
+				message := b.BotGetMessage(messageuuid)
+				messageCountperUser[message.UserId]++
+			}
+
+		}
+
+		// ランキング集計状況の更新
+		//mapのpair化
+		pl := make(MessageCountPairList, len(messageCountperUser))
+		i := 0
+		for k, v := range messageCountperUser {
+			pl[i] = MessageCountPair{k, v}
+			i++
+		}
+
+		sort.Sort(sort.Reverse(pl)) //pair化したmapのソート
+
+		//pairを元に返信の書き出し
+		response = "searching... :loading:\n| rank | username | total |\n| - | - | - |\n" //基礎
+		for i, list := range pl {
+			response += ("|" + strconv.Itoa(i) + "|:@" + b.BotGetUserName(list.Key) + ":|" + strconv.Itoa(i) + "|\n")
+			if i >= 20 {
+				break
+			}
+		}
+		b.BotSimpleEdit(responseuuid, response)
+
+		if len(messages.Hits) < 100 || i == 9900 {
+			break
+		}
+
+	}
+
+	return response
+}
+
 // 選択したuserからメッセージを100件取得する(Bot版)
 func (b *BotHandler) BotGetUserMessages(userid string, offset int) (message *traq.MessageSearchResult, err error) {
 	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
@@ -194,3 +293,29 @@ func (b *BotHandler) BotGetUserMessages(userid string, offset int) (message *tra
 //------------------------------------------------
 // チャンネル監視関連
 //------------------------------------------------
+
+// 指定したチャンネルからメッセージを100件取得する
+func (b *BotHandler) BotGetChannelMessages(channelid string, offset int) (message *traq.MessageSearchResult, err error) {
+	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
+		In(channelid).Limit(100).Offset(int32(offset)).
+		Sort(`createdAt`).Execute()
+	if err != nil {
+		return messages, err
+	}
+	log.Println("取得数:", len(messages.Hits))
+	log.Println("取得mes:", messages.TotalHits)
+	return messages, nil
+}
+
+// 引用ありのみ
+func (b *BotHandler) BotGetChannelMessagesWithQuote(channelid string, offset int) (message *traq.MessageSearchResult, err error) {
+	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
+		In(channelid).Limit(100).Offset(int32(offset)).HasURL(true).
+		Sort(`createdAt`).Execute()
+	if err != nil {
+		return messages, err
+	}
+	log.Println("取得数:", len(messages.Hits))
+	log.Println("取得mes:", messages.TotalHits)
+	return messages, nil
+}

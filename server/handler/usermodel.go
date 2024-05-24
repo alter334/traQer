@@ -48,3 +48,17 @@ type DMSubscriber struct {
 	Userid           string `json:"userid" db:"userid"`
 	NotifyFlowAmount int    `json:"notifyflowamount" db:"notifyflowamount"`
 }
+
+//--------------------------------------------------------
+
+// メッセージ集計mapのソート
+type MessageCountPair struct {
+	Key   string
+	Value int
+}
+
+type MessageCountPairList []MessageCountPair
+
+func (p MessageCountPairList) Len() int           { return len(p) }
+func (p MessageCountPairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
+func (p MessageCountPairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
