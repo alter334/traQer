@@ -193,7 +193,8 @@ func (b *BotHandler) BotGetLongMessages(username string, length int) (messageuui
 // 収集したメッセージ群から情報を求める
 func (b *BotHandler) BotWUserrank(after string, before string, channeltopost string) string {
 
-	messageCountperUser := map[string]int{}                  //ランキング用mapの生成
+	messageCountperUser := map[string]int{} //ランキング用mapの生成
+	var pl MessageCountPairList
 	response := "searching... :loading:"                     //結果表示用文字列
 	responseuuid := b.BotSimplePost(channeltopost, response) //返信用メッセージの作成
 	channelid := "5b7b8143-7c0d-4ade-8658-3a8d8ce4dd83"      //gps/trend/w のチャンネルid
@@ -249,20 +250,20 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 
 		// ランキング集計状況の更新
 		//mapのpair化
-		pl := make(MessageCountPairList, len(messageCountperUser))
-		i := 0
+		pl = make(MessageCountPairList, len(messageCountperUser))
+		j := 0
 		for k, v := range messageCountperUser {
-			pl[i] = MessageCountPair{k, v}
-			i++
+			pl[j] = MessageCountPair{k, v}
+			j++
 		}
 
 		sort.Sort(sort.Reverse(pl)) //pair化したmapのソート
 
 		//pairを元に返信の書き出し
-		response = "searching... :loading:\n| rank | username | total |\n| - | - | - |\n" //基礎
-		for i, list := range pl {
-			response += ("|" + strconv.Itoa(i) + "|:@" + b.BotGetUserName(list.Key) + ":|" + strconv.Itoa(list.Value) + "|\n")
-			if i >= 20 {
+		response = "collecting..." + strconv.Itoa(i) + "\nsearching... :loading:\n| rank | username | total |\n| - | - | - |\n" //基礎
+		for x, list := range pl {
+			response += ("|" + strconv.Itoa(x) + "|:@" + b.BotGetUserName(list.Key) + ":|" + strconv.Itoa(list.Value) + "|\n")
+			if x >= 20 {
 				break
 			}
 		}
@@ -273,6 +274,15 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 		}
 
 	}
+
+	response = "| rank | username | total |\n| - | - | - |\n" //基礎
+	for i, list := range pl {
+		response += ("|" + strconv.Itoa(i) + "|:@" + b.BotGetUserName(list.Key) + ":|" + strconv.Itoa(list.Value) + "|\n")
+		if i >= 20 {
+			break
+		}
+	}
+	b.BotSimpleEdit(responseuuid, response)
 
 	return response
 }
