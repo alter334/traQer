@@ -216,7 +216,7 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 		return "BTime parsing Error:" + err.Error()
 	}
 
-	for i := 0; ; i += 100 {
+	for i := 0; ; i += 10 {
 		messages, err := b.BotGetChannelMessagesWithQuote(channelid, i)
 		if err != nil {
 			return "Polling Error:" + err.Error()
@@ -266,13 +266,13 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 		response = "collecting..." + strconv.Itoa(i) + "\nsearching... :loading:\n| rank | username | total |\n| - | - | - |\n" //基礎
 		for x, list := range pl {
 			response += ("|" + strconv.Itoa(x) + "|:@" + b.BotGetUserName(list.Key) + ":|" + strconv.Itoa(list.Value) + "|\n")
-			if x >= 20 {
+			if x >= 50 {
 				break
 			}
 		}
 		b.BotSimpleEdit(responseuuid, response)
 
-		if len(messages.Hits) < 100 || i == 9900 {
+		if len(messages.Hits) < 10 || i == 9990 {
 			break
 		}
 
@@ -281,7 +281,7 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 	response = "| rank | username | total |\n| - | - | - |\n" //基礎
 	for i, list := range pl {
 		response += ("|" + strconv.Itoa(i) + "|:@" + b.BotGetUserName(list.Key) + ":|" + strconv.Itoa(list.Value) + "|\n")
-		if i >= 20 {
+		if i >= 50 {
 			break
 		}
 	}
