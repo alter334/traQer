@@ -33,6 +33,7 @@ func (b *BotHandler) BotSimplePost(channelID string, content string) (messageid 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+		return ""
 	}
 	return q.Id
 }
@@ -243,7 +244,9 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 			for _, messageurl := range urls {
 				messageuuid := strings.Split(messageurl, "/")[4]
 				message := b.BotGetMessage(messageuuid)
-				messageCountperUser[message.UserId]++
+				if message != nil {
+					messageCountperUser[message.UserId]++
+				}
 			}
 
 		}
