@@ -261,7 +261,7 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 		//pairを元に返信の書き出し
 		response = "searching... :loading:\n| rank | username | total |\n| - | - | - |\n" //基礎
 		for i, list := range pl {
-			response += ("|" + strconv.Itoa(i) + "|:@" + b.BotGetUserName(list.Key) + ":|" + strconv.Itoa(i) + "|\n")
+			response += ("|" + strconv.Itoa(i) + "|:@" + b.BotGetUserName(list.Key) + ":|" + strconv.Itoa(list.Value) + "|\n")
 			if i >= 20 {
 				break
 			}
