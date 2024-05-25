@@ -49,6 +49,7 @@ func (h *Handler) BotHandler() {
 				break
 			} else if cmd[1] == ":w:" {
 				h.b.BotWUserrank("", "", p.Message.ChannelID)
+				break
 			}
 			message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
 			h.b.BotSimpleEdit(message, h.BotCollectUserRank(cmd[1]))
