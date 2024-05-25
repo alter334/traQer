@@ -204,7 +204,7 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 		after = "20200101" //空白処理
 	}
 	if before == "" {
-		before = time.Now().Format("20060102") //空白処理
+		before = time.Now().AddDate(0,0,2).Format("20060102") //空白処理
 	}
 
 	aftertime, err := time.Parse("20060102", after)
