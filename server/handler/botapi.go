@@ -280,8 +280,8 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 
 	response = "| rank | username | total |\n| - | - | - |\n" //基礎
 	for i, list := range pl {
-		response += ("|" + strconv.Itoa(i) + "|:@" + b.BotGetUserName(list.Key) + ":|" + strconv.Itoa(list.Value) + "|\n")
-		if i >= 50 {
+		response += ("|" + strconv.Itoa(i+1) + "|:@" + b.BotGetUserName(list.Key) + ":|" + strconv.Itoa(list.Value) + "|\n")
+		if i >= 49 {
 			break
 		}
 	}
