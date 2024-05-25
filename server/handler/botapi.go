@@ -230,10 +230,10 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 				continue
 			}
 			if !message.CreatedAt.After(aftertime) {
-				break
+				continue
 			}
 			if !message.CreatedAt.Before(beforetime) {
-				continue
+				break
 			}
 			urls := strings.Fields(message.Content)
 			if len(urls) != 10 {
@@ -311,7 +311,7 @@ func (b *BotHandler) BotGetUserMessages(userid string, offset int) (message *tra
 func (b *BotHandler) BotGetChannelMessages(channelid string, offset int) (message *traq.MessageSearchResult, err error) {
 	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
 		In(channelid).Limit(10).Offset(int32(offset)).
-		Sort(`createdAt`).Execute()
+		Sort(`-createdAt`).Execute()
 	if err != nil {
 		return messages, err
 	}
