@@ -10,8 +10,7 @@ func (h *Handler) GetChannelNameWithParents(channelid string, children string) (
 		return "", err
 	}
 
-	parent, ok := channel.GetParentIdOk()
-	log.Println(ok)
+	parent, _ := channel.GetParentIdOk()
 
 	if parent == nil {
 		channelname = channel.GetName() + children
@@ -25,4 +24,17 @@ func (h *Handler) GetChannelNameWithParents(channelid string, children string) (
 	}
 	return channelname, nil
 
+}
+
+func (h *Handler) GetViewers(channelid string) (users []string, err error) {
+	userstats, _, err := h.client.ChannelApi.GetChannelViewers(h.auth, channelid).Execute()
+	if err != nil {
+		log.Println("GetViewersError:", err.Error())
+		return users, err
+	}
+	for _, stat := range userstats {
+		users = append(users, stat.UserId)
+	}
+
+	return users, nil
 }
