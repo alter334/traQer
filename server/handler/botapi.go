@@ -204,7 +204,7 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 		after = "20200101" //空白処理
 	}
 	if before == "" {
-		before = time.Now().AddDate(0,0,2).Format("20060102") //空白処理
+		before = time.Now().AddDate(0, 0, 2).Format("20060102") //空白処理
 	}
 
 	aftertime, err := time.Parse("20060102", after)
@@ -311,7 +311,7 @@ func (b *BotHandler) BotGetUserMessages(userid string, offset int) (message *tra
 func (b *BotHandler) BotGetChannelMessages(channelid string, offset int) (message *traq.MessageSearchResult, err error) {
 	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
 		In(channelid).Limit(10).Offset(int32(offset)).
-		Sort(`-createdAt`).Execute()
+		Sort(`createdAt`).Execute()
 	if err != nil {
 		return messages, err
 	}
@@ -324,7 +324,7 @@ func (b *BotHandler) BotGetChannelMessages(channelid string, offset int) (messag
 func (b *BotHandler) BotGetChannelMessagesWithQuote(channelid string, offset int) (message *traq.MessageSearchResult, err error) {
 	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
 		In(channelid).Limit(10).Offset(int32(offset)).HasURL(true).
-		Sort(`createdAt`).Execute()
+		Sort(`-createdAt`).Execute()
 	if err != nil {
 		return messages, err
 	}
