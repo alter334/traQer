@@ -89,7 +89,7 @@ func (h *Handler) SendingGTActive(messagecounts []RecentMessageCountbyChannel) {
 	// 購読者の取得(基準メッセ数が多い順)->メッセージを伸ばしていく感じ->内容ができたら配信
 
 	i := 0                                             //messagecountsのどこまで消化したかのイテレーション
-	notifycount := 1                                   //通知数の設定
+	notifycount := 10                                   //通知数の設定
 	gtactive := "1e247400-962f-4cf9-8def-2051f815cd78" //送信先
 	content := ""
 
