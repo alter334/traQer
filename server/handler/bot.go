@@ -67,6 +67,9 @@ func (h *Handler) BotHandler() {
 				message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
 				_, content := h.b.BotGetLongMessages(cmd[2], 1000)
 				h.b.BotSimpleEdit(message, content)
+			} else if cmd[1] == ":w:" {
+				h.b.BotWUserrank(cmd[2], "", p.Message.ChannelID) //after のみ
+				break
 			} else {
 				h.b.BotSimplePost(p.Message.ChannelID, "Insert valid commands")
 			}
@@ -80,6 +83,9 @@ func (h *Handler) BotHandler() {
 					_, content := h.b.BotGetLongMessages(cmd[2], cmdint)
 					h.b.BotSimpleEdit(message, content)
 				}
+			} else if cmd[1] == ":w:" {
+				h.b.BotWUserrank(cmd[2], cmd[3], p.Message.ChannelID) //after before
+				break
 			} else {
 				h.b.BotSimplePost(p.Message.ChannelID, "Insert valid commands")
 			}
