@@ -134,6 +134,16 @@ func (b *BotHandler) BotGetGroupMembers(groupid string) (groupmembersids []strin
 
 }
 
+// UserのホームチャンネルUUIDを返す
+func (b *BotHandler) GetUserHome(userID string) (homeUUID string) {
+	userdetail, httpres, err := b.bot.API().UserApi.GetUser(context.Background(), userID).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
+	}
+	return userdetail.GetHomeChannel()
+}
+
 // ----------------------------------------------------------------
 // メッセージ収集関連
 // ----------------------------------------------------------------

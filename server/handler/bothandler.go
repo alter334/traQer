@@ -15,7 +15,12 @@ func (h *Handler) BotCollectUserRank(groupName string) (x string) {
 	if groupName == "" {
 		res = "全ユーザー投稿数ランキング\n|順位|ユーザー|投稿数|\n|---|---|---|\n"
 		for i, data := range h.nowhavingdata {
-			res += ("|" + strconv.Itoa(i+1) + "|:@" + data.Name + ": " + data.Name + "|" + strconv.Itoa(int(data.TotalMessageCount)) + "|\n")
+			homebase := "https://q.trap.jp/channels/"
+			homename, err := h.GetChannelNameWithParents(data.Homechannel, "")
+			if err != nil {
+				homename = ""
+			}
+			res += ("|" + strconv.Itoa(i+1) + "|[:@" + data.Name + ": " + data.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(data.TotalMessageCount)) + "|\n")
 			if i == 99 {
 				break
 			}
@@ -42,7 +47,12 @@ func (h *Handler) BotCollectUserRank(groupName string) (x string) {
 		_, exist := groupmembermap[data.Id]
 		if exist {
 			ct++
-			res += ("|" + strconv.Itoa(ct) + "|:@" + data.Name + ": " + data.Name + "|" + strconv.Itoa(int(data.TotalMessageCount)) + "|\n")
+			homebase := "https://q.trap.jp/channels/"
+			homename, err := h.GetChannelNameWithParents(data.Homechannel, "")
+			if err != nil {
+				homename = ""
+			}
+			res += ("|" + strconv.Itoa(ct) + "|[:@" + data.Name + ": " + data.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(data.TotalMessageCount)) + "|\n")
 			if ct == 100 {
 				break
 			}
