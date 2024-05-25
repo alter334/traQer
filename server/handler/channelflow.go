@@ -63,10 +63,19 @@ func (h *Handler) SendingDMs(messagecounts []RecentMessageCountbyChannel) {
 				log.Println("Error getting channelname:", err.Error())
 				return
 			}
+			viewers, err := h.GetViewers(messagecounts[i].Channelid)
+			if err != nil {
+				log.Println("Error getting channelviewers:", err.Error())
+				return
+			}
+			viewersicon := ""
+			for _, viewer := range viewers {
+				viewersicon += ":@" + h.b.BotGetUserName(viewer) + ":"
+			}
 			// とりあえずは15分のみ対応
 			content += "|**[#" + channelname + "]" +
 				"(https://q.trap.jp/channels/" + channelname + ")**|**" +
-				strconv.Itoa(messagecounts[i].Count) + "**|\n"
+				strconv.Itoa(messagecounts[i].Count) + "**|" + viewersicon + "|\n"
 			i++
 			if i == len(messagecounts) {
 				break
@@ -89,7 +98,7 @@ func (h *Handler) SendingGTActive(messagecounts []RecentMessageCountbyChannel) {
 	// 購読者の取得(基準メッセ数が多い順)->メッセージを伸ばしていく感じ->内容ができたら配信
 
 	i := 0                                             //messagecountsのどこまで消化したかのイテレーション
-	notifycount := 10                                   //通知数の設定
+	notifycount := 10                                  //通知数の設定
 	gtactive := "1e247400-962f-4cf9-8def-2051f815cd78" //送信先
 	content := ""
 
@@ -99,10 +108,19 @@ func (h *Handler) SendingGTActive(messagecounts []RecentMessageCountbyChannel) {
 			log.Println("Error getting channelname:", err.Error())
 			return
 		}
+		viewers, err := h.GetViewers(messagecounts[i].Channelid)
+		if err != nil {
+			log.Println("Error getting channelviewers:", err.Error())
+			return
+		}
+		viewersicon := ""
+		for _, viewer := range viewers {
+			viewersicon += ":@" + h.b.BotGetUserName(viewer) + ":"
+		}
 		// とりあえずは15分のみ対応
 		content += "|**[#" + channelname + "]" +
 			"(https://q.trap.jp/channels/" + channelname + ")**|**" +
-			strconv.Itoa(messagecounts[i].Count) + "**|\n"
+			strconv.Itoa(messagecounts[i].Count) + "**|" + viewersicon + "|\n"
 		i++
 		if i == len(messagecounts) {
 			break
