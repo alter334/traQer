@@ -127,7 +127,7 @@ func (h *Handler) SendingGTActive(messagecounts []RecentMessageCountbyChannel) {
 		}
 	}
 	if content != "" {
-		contentsend := "## 直近15分の流速案内\n|チャンネル|投稿数/15分|\n|---|---|\n" + content
+		contentsend := "## 直近15分の流速案内\n|チャンネル|投稿数/15分|閲覧者|\n|---|---|---|\n" + content
 		h.b.BotSimplePost(gtactive, contentsend)
 	}
 
