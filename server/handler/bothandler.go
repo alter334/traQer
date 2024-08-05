@@ -79,7 +79,7 @@ func (h *Handler) BotCollectTagRank(groupName string) (x string) {
 			tagRank = append(tagRank, UserTags{UserDetail: data, TotalTagCount: tagCount})
 		}
 		sort.SliceStable(tagRank, func(i, j int) bool { return tagRank[i].TotalTagCount > tagRank[j].TotalTagCount })
-		log.Print(tagRank)
+
 		res = "全ユーザータグ数ランキング\n|順位|ユーザー|タグ数|\n|---|---|---|\n"
 		for i, tag := range tagRank {
 			homebase := "https://q.trap.jp/channels/"
@@ -121,13 +121,9 @@ func (h *Handler) BotCollectTagRank(groupName string) (x string) {
 				return "TagCollect error"
 			}
 			tagRank = append(tagRank, UserTags{UserDetail: data, TotalTagCount: tagCount})
-			if ct == 100 {
-				break
-			}
 		}
 	}
 	sort.SliceStable(tagRank, func(i, j int) bool { return tagRank[i].TotalTagCount > tagRank[j].TotalTagCount })
-	log.Print(tagRank)
 
 	for i, tag := range tagRank {
 		homebase := "https://q.trap.jp/channels/"
