@@ -245,3 +245,12 @@ func (h *Handler) MessageCountsBind(usetraqAPI bool) {
 	h.nowhavingdata = nowcollectingdata
 
 }
+
+// ユーザタグ数取得
+func (h *Handler) GetUserTagCount(userid string) (count int, httpres *http.Response, err error) {
+	res, httpres, err := h.client.UserTagApi.GetUserTags(h.auth, userid).Execute()
+	if err != nil {
+		return 0, httpres, err
+	}
+	return len(res), httpres, err
+}

@@ -50,6 +50,10 @@ func (h *Handler) BotHandler() {
 			} else if cmd[1] == ":w:" {
 				h.b.BotWUserrank("", "", p.Message.ChannelID)
 				break
+			} else if cmd[1] == "tag" {
+				message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
+				h.b.BotSimpleEdit(message, h.BotCollectTagRank(""))
+				break
 			}
 			message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
 			h.b.BotSimpleEdit(message, h.BotCollectUserRank(cmd[1]))
@@ -69,6 +73,10 @@ func (h *Handler) BotHandler() {
 				h.b.BotSimpleEdit(message, content)
 			} else if cmd[1] == ":w:" {
 				h.b.BotWUserrank(cmd[2], "", p.Message.ChannelID) //after のみ
+				break
+			} else if cmd[1] == "tag" {
+				message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
+				h.b.BotSimpleEdit(message, h.BotCollectTagRank(cmd[2]))
 				break
 			} else {
 				h.b.BotSimplePost(p.Message.ChannelID, "Insert valid commands")

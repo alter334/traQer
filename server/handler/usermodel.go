@@ -24,6 +24,12 @@ type UserDetailWithMessageCount struct {
 	DailyMessageCount int64  `json:"dailymessagecount" db:"dailypostcounts"`
 }
 
+// タグ数取得用
+type UserTags struct {
+	UserDetail    *UserDetailWithMessageCount `json:"userdetail"`
+	TotalTagCount int                         `json:"TotalMessageCount"`
+}
+
 // メッセージ取得用stract
 type MessageCountuuid struct {
 	Userid       string `json:"userid" db:"userid"`
