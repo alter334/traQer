@@ -96,7 +96,7 @@ func (h *Handler) BotCollectTagRank(groupName string) (x string) {
 		return res
 	}
 
-	res = (groupName + " 所属投稿数ランキング\n|順位|ユーザー|タグ数|\n|---|---|---|\n")
+	res = (groupName + " 所属タグ数ランキング\n|順位|ユーザー|タグ数|\n|---|---|---|\n")
 	//グループ指定ありのランク グループIDを取得する
 	groupid := h.b.BotGetGroupUUID(groupName)
 	if groupid == "" {
