@@ -26,7 +26,7 @@ type UserDetailWithMessageCount struct {
 
 // タグ数取得用
 type UserTags struct {
-	UserDetail    *UserDetailWithMessageCount `json:"userdetail"`
+	UserDetail    UserDetailWithMessageCount `json:"userdetail"`
 	TotalTagCount int                         `json:"TotalMessageCount"`
 }
 

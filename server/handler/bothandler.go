@@ -76,7 +76,7 @@ func (h *Handler) BotCollectTagRank(groupName string) (x string) {
 				log.Println("Internal error:", err.Error())
 				return "TagCollect error"
 			}
-			tagRank = append(tagRank, UserTags{UserDetail: &data, TotalTagCount: tagCount})
+			tagRank = append(tagRank, UserTags{UserDetail: data, TotalTagCount: tagCount})
 		}
 		sort.SliceStable(tagRank, func(i, j int) bool { return tagRank[i].TotalTagCount > tagRank[j].TotalTagCount })
 		log.Print(tagRank)
@@ -120,13 +120,13 @@ func (h *Handler) BotCollectTagRank(groupName string) (x string) {
 				log.Println("Internal error:", err.Error())
 				return "TagCollect error"
 			}
-			tagRank = append(tagRank, UserTags{UserDetail: &data, TotalTagCount: tagCount})
+			tagRank = append(tagRank, UserTags{UserDetail: data, TotalTagCount: tagCount})
 			if ct == 100 {
 				break
 			}
 		}
 	}
-	sort.SliceStable(tagRank, func(i, j int) bool { return tagRank[i].TotalTagCount < tagRank[j].TotalTagCount })
+	sort.SliceStable(tagRank, func(i, j int) bool { return tagRank[i].TotalTagCount > tagRank[j].TotalTagCount })
 	log.Print(tagRank)
 
 	for i, tag := range tagRank {
