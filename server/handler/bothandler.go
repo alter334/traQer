@@ -154,13 +154,13 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 				return "TagCollect error"
 			}
 			if tagCount == 0 {
-				tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: 0})
+				tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: 1000000})
 				continue
 			}
 
 			tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: int(data.TotalMessageCount) / tagCount})
 		}
-		sort.SliceStable(tagRankRate, func(i, j int) bool { return tagRankRate[i].TotalTagCount > tagRankRate[j].TotalTagCount })
+		sort.SliceStable(tagRankRate, func(i, j int) bool { return tagRankRate[i].TotalTagCount < tagRankRate[j].TotalTagCount })
 
 		res = "全ユーザータグ毎投稿数ランキング\n|順位|ユーザー|タグ毎投稿数|\n|---|---|---|\n"
 		for i, tag := range tagRankRate {
@@ -168,6 +168,11 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 			homename, err := h.GetChannelNameWithParents(tag.UserDetail.Homechannel, "")
 			if err != nil {
 				homename = ""
+			}
+
+			if tag.TotalTagCount == 1000000 {
+				res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|Nan|\n")
+				continue
 			}
 
 			res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(tag.TotalTagCount)) + "|\n")
@@ -203,19 +208,23 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 				return "TagCollect error"
 			}
 			if tagCount == 0 {
-				tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: 0})
+				tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: 1000000})
 				continue
 			}
 			tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: int(data.TotalMessageCount) / tagCount})
 		}
 	}
-	sort.SliceStable(tagRankRate, func(i, j int) bool { return tagRankRate[i].TotalTagCount > tagRankRate[j].TotalTagCount })
+	sort.SliceStable(tagRankRate, func(i, j int) bool { return tagRankRate[i].TotalTagCount < tagRankRate[j].TotalTagCount })
 
 	for i, tag := range tagRankRate {
 		homebase := "https://q.trap.jp/channels/"
 		homename, err := h.GetChannelNameWithParents(tag.UserDetail.Homechannel, "")
 		if err != nil {
 			homename = ""
+		}
+		if tag.TotalTagCount == 1000000 {
+			res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|Nan|\n")
+			continue
 		}
 
 		res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(tag.TotalTagCount)) + "|\n")
