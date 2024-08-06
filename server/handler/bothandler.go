@@ -141,7 +141,7 @@ func (h *Handler) BotCollectTagRank(groupName string) (x string) {
 
 }
 
-func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
+func (h *Handler) BotCollectTagRateRank(groupName string, late int) (x string) {
 
 	res := ""
 	var tagRankRate []UserTags
@@ -157,12 +157,13 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 				tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: 1000000})
 				continue
 			}
-
-			tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: int(data.TotalMessageCount) / tagCount})
+			if int(data.TotalMessageCount) >= late {
+				tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: int(data.TotalMessageCount) / tagCount})
+			}
 		}
 		sort.SliceStable(tagRankRate, func(i, j int) bool { return tagRankRate[i].TotalTagCount < tagRankRate[j].TotalTagCount })
 
-		res = "全ユーザータグ毎投稿数ランキング\n|順位|ユーザー|タグ毎投稿数|\n|---|---|---|\n"
+		res = "全ユーザータグ毎投稿数ランキング\n|順位|ユーザー|タグ毎投稿数|投稿数|\n|---|---|---|---|\n"
 		for i, tag := range tagRankRate {
 			homebase := "https://q.trap.jp/channels/"
 			homename, err := h.GetChannelNameWithParents(tag.UserDetail.Homechannel, "")
@@ -176,13 +177,16 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 				break
 			}
 
-			res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(tag.TotalTagCount)) + "|\n")
+			res += ("|" + strconv.Itoa(i+1) +
+				"|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|" +
+				strconv.Itoa(int(tag.TotalTagCount)) + "|" +
+				strconv.Itoa(int(tag.UserDetail.TotalMessageCount)) + "|" + "\n")
 
 		}
 		return res
 	}
 
-	res = (groupName + " 所属タグ毎投稿数ランキング\n|順位|ユーザー|タグ毎投稿数|\n|---|---|---|\n")
+	res = (groupName + " 所属タグ毎投稿数ランキング\n|順位|ユーザー|タグ毎投稿数|投稿数|\n|---|---|---|---|\n")
 	//グループ指定ありのランク グループIDを取得する
 	groupid := h.b.BotGetGroupUUID(groupName)
 	if groupid == "" {
@@ -210,7 +214,9 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 				tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: 1000000})
 				continue
 			}
-			tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: int(data.TotalMessageCount) / tagCount})
+			if int(data.TotalMessageCount) >= late {
+				tagRankRate = append(tagRankRate, UserTags{UserDetail: data, TotalTagCount: int(data.TotalMessageCount) / tagCount})
+			}
 		}
 	}
 	sort.SliceStable(tagRankRate, func(i, j int) bool { return tagRankRate[i].TotalTagCount < tagRankRate[j].TotalTagCount })
@@ -228,7 +234,10 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 			break
 		}
 
-		res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(tag.TotalTagCount)) + "|\n")
+		res += ("|" + strconv.Itoa(i+1) +
+			"|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|" +
+			strconv.Itoa(int(tag.TotalTagCount)) + "|" +
+			strconv.Itoa(int(tag.UserDetail.TotalMessageCount)) + "|" + "\n")
 
 	}
 	return res

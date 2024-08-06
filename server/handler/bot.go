@@ -56,7 +56,7 @@ func (h *Handler) BotHandler() {
 				break
 			} else if cmd[1] == "\\tagper" {
 				message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
-				h.b.BotSimpleEdit(message, h.BotCollectTagRateRank(""))
+				h.b.BotSimpleEdit(message, h.BotCollectTagRateRank("", 0))
 				break
 			}
 			message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
@@ -84,7 +84,16 @@ func (h *Handler) BotHandler() {
 				break
 			} else if cmd[1] == "\\tagper" {
 				message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
-				h.b.BotSimpleEdit(message, h.BotCollectTagRateRank(cmd[2]))
+				h.b.BotSimpleEdit(message, h.BotCollectTagRateRank(cmd[2], 0))
+				break
+			} else if cmd[1] == "\\tagperwithamount" {
+				message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
+				amount, err := strconv.Atoi(cmd[2])
+				if err != nil || amount < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid number")
+					break
+				}
+				h.b.BotSimpleEdit(message, h.BotCollectTagRateRank("", amount))
 				break
 			} else {
 				h.b.BotSimplePost(p.Message.ChannelID, "Insert valid commands")
@@ -101,6 +110,15 @@ func (h *Handler) BotHandler() {
 				}
 			} else if cmd[1] == ":w:" {
 				h.b.BotWUserrank(cmd[2], cmd[3], p.Message.ChannelID) //after before
+				break
+			} else if cmd[1] == "\\tagperwithamount" {
+				message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
+				amount, err := strconv.Atoi(cmd[3])
+				if err != nil || amount < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid number")
+					break
+				}
+				h.b.BotSimpleEdit(message, h.BotCollectTagRateRank(cmd[2], amount))
 				break
 			} else {
 				h.b.BotSimplePost(p.Message.ChannelID, "Insert valid commands")
