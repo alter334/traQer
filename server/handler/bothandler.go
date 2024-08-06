@@ -169,16 +169,16 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 			if err != nil {
 				homename = ""
 			}
-
+			if i == 100 {
+				break
+			}
 			if tag.TotalTagCount == 1000000 {
 				res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|Nan|\n")
 				continue
 			}
 
 			res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(tag.TotalTagCount)) + "|\n")
-			if i == 99 {
-				break
-			}
+
 		}
 		return res
 	}
@@ -222,15 +222,16 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 		if err != nil {
 			homename = ""
 		}
+		if i == 100 {
+			break
+		}
 		if tag.TotalTagCount == 1000000 {
 			res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|Nan|\n")
 			continue
 		}
 
 		res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(tag.TotalTagCount)) + "|\n")
-		if i == 99 {
-			break
-		}
+
 	}
 	return res
 
