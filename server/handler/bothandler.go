@@ -173,8 +173,7 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 				break
 			}
 			if tag.TotalTagCount == 1000000 {
-				res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|Nan|\n")
-				continue
+				break
 			}
 
 			res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(tag.TotalTagCount)) + "|\n")
@@ -183,7 +182,7 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 		return res
 	}
 
-	res = (groupName + " 所属タグ毎投稿数ランキング\n|順位|ユーザー|毎投稿数|\n|---|---|---|\n")
+	res = (groupName + " 所属タグ毎投稿数ランキング\n|順位|ユーザー|タグ毎投稿数|\n|---|---|---|\n")
 	//グループ指定ありのランク グループIDを取得する
 	groupid := h.b.BotGetGroupUUID(groupName)
 	if groupid == "" {
@@ -226,8 +225,7 @@ func (h *Handler) BotCollectTagRateRank(groupName string) (x string) {
 			break
 		}
 		if tag.TotalTagCount == 1000000 {
-			res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|Nan|\n")
-			continue
+			break
 		}
 
 		res += ("|" + strconv.Itoa(i+1) + "|[:@" + tag.UserDetail.Name + ": " + tag.UserDetail.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(tag.TotalTagCount)) + "|\n")
