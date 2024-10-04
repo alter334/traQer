@@ -1,4 +1,4 @@
-module traQer
+module github.com/alter334/traQer
 
 go 1.20
 

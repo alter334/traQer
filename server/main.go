@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"traQer/handler"
+	"github.com/alter334/traQer/handler"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
