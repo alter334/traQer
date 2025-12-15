@@ -413,7 +413,7 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 		return "", err
 	}
 
-	b.BotSimpleEdit(responseuuid, string(jsonBytes))
+	b.BotSimpleEdit(responseuuid, "```\n" + string(jsonBytes) + "\n```")
 
 	return string(jsonBytes), nil
 }
