@@ -371,7 +371,7 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 	var result []MessageInfo
 
 	for i := 0; ; i += 100 {
-		hit, err := b.BotGetMessagesBeteween(after, before, i)
+		hit, err := b.BotGetMessagesBeteween(after, before, i%10000)
 		if err != nil {
 			return "", err
 		}
@@ -386,7 +386,7 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 				stampName := b.BotGetStampName(stamp.StampId)
 				stampMap[stampName]++
 			}
-			
+
 			var stampSlice []StampInfo
 			for name, count := range stampMap {
 				stampSlice = append(stampSlice, StampInfo{name, count})
@@ -394,12 +394,12 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 			sort.Slice(stampSlice, func(i, j int) bool {
 				return stampSlice[i].Count > stampSlice[j].Count
 			})
-			
+
 			// 上位5件だけ残す
 			if len(stampSlice) > 5 {
 				stampSlice = stampSlice[:5]
 			}
-			
+
 			stampTotal = 0
 			for _, stamp := range stampSlice {
 				stampTotal += stamp.Count
@@ -417,7 +417,15 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 				})
 			}
 		}
-		if len(hit.Hits) < 100 || i == 9900 || len(result) >= maxmes {
+		if (i % 10000) == 9900 {
+			// beforeを最後に取得したメッセージの日時に更新する
+			if len(hit.Hits) > 0 {
+				before = hit.Hits[len(hit.Hits)-1].CreatedAt.Format("20060102")
+				log.Println("Updating before to:", before)
+			}
+		}
+		if len(hit.Hits) < 98 || len(result) >= maxmes {
+			// 動作安定化のため98件で判定
 			break
 		}
 	}
