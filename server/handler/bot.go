@@ -123,6 +123,63 @@ func (h *Handler) BotHandler() {
 			} else {
 				h.b.BotSimplePost(p.Message.ChannelID, "Insert valid commands")
 			}
+		case 5:
+			if cmd[1] == "\\stampcount" {
+				total, err := strconv.Atoi(cmd[2])
+				if err != nil || total < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid total number")
+					break
+				}
+				kind, err := strconv.Atoi(cmd[3])
+				if err != nil || kind < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid kind number")
+					break
+				}
+				maxmes, err := strconv.Atoi(cmd[4])
+				if err != nil || maxmes < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid maxmes number")
+					break
+				}
+				h.b.BotGetStampedMessage(total, kind, maxmes, "", "", p.Message.ChannelID)
+			}
+		case 6:
+			if cmd[1] == "\\stampcount" {
+				total, err := strconv.Atoi(cmd[2])
+				if err != nil || total < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid total number")
+					break
+				}
+				kind, err := strconv.Atoi(cmd[3])
+				if err != nil || kind < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid kind number")
+					break
+				}
+				maxmes, err := strconv.Atoi(cmd[4])
+				if err != nil || maxmes < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid maxmes number")
+					break
+				}
+				h.b.BotGetStampedMessage(total, kind, maxmes, cmd[5], "", p.Message.ChannelID)
+			}
+		case 7:
+			if cmd[1] == "\\stampcount" {
+				total, err := strconv.Atoi(cmd[2])
+				if err != nil || total < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid total number")
+					break
+				}
+				kind, err := strconv.Atoi(cmd[3])
+				if err != nil || kind < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid kind number")
+					break
+				}
+				maxmes, err := strconv.Atoi(cmd[4])
+				if err != nil || maxmes < 0 {
+					h.b.BotSimplePost(p.Message.ChannelID, "Insert valid maxmes number")
+					break
+				}
+				h.b.BotGetStampedMessage(total, kind, maxmes, cmd[5], cmd[6], p.Message.ChannelID)
+			}
 		// case 2:
 		// 	switch cmd[1] {
 		// 	case "dbenroll":

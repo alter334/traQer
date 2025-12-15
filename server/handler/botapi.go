@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -142,6 +143,17 @@ func (b *BotHandler) GetUserHome(userID string) (homeUUID string) {
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
 	}
 	return userdetail.GetHomeChannel()
+}
+
+// スタンプUUIDからスタンプ名を返す
+func (b *BotHandler) BotGetStampName(stampID string) (stampName string) {
+	stamp, httpres, err := b.bot.API().StampApi.GetStamp(context.Background(), stampID).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
+		return stampID // エラーの場合はUUIDをそのまま返す
+	}
+	return stamp.GetName()
 }
 
 // ----------------------------------------------------------------
@@ -311,6 +323,99 @@ func (b *BotHandler) BotGetUserMessages(userid string, offset int) (message *tra
 	log.Println("取得数:", len(messages.Hits))
 	log.Println("取得mes:", messages.TotalHits)
 	return messages, nil
+}
+
+// 指定した期間内のメッセージを100件取得する(Bot版)
+func (b *BotHandler) BotGetMessagesBeteween(after string, before string, offset int) (message *traq.MessageSearchResult, err error) {
+	if after == "" {
+		after = "20200101" //空白処理
+	}
+	if before == "" {
+		before = time.Now().AddDate(0, 0, 2).Format("20060102") //空白処理
+	}
+
+	aftertime, err := time.Parse("20060102", after)
+	if err != nil {
+		return nil, err
+	}
+	beforetime, err := time.Parse("20060102", before)
+	if err != nil {
+		return nil, err
+	}
+	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
+		After(aftertime).Before(beforetime).Limit(100).Offset(int32(offset)).
+		Sort(`createdAt`).Execute()
+	if err != nil {
+		return messages, err
+	}
+	log.Println("取得数:", len(messages.Hits))
+	log.Println("取得mes:", messages.TotalHits)
+	return messages, nil
+}
+
+// スタンプ数が特定以上のメッセージを取得する スタンプ合計数,スタンプ合計種類数,指定日時より前/後の設定ができる
+
+func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after string, before string, channeltopost string) (jsonString string, err error) {
+	response := "searching... :loading:"                     //結果表示用文字列
+	responseuuid := b.BotSimplePost(channeltopost, response) //返信用メッセージの作成
+	type StampInfo struct {
+		Name  string `json:"name"`
+		Count int    `json:"count"`
+	}
+
+	type MessageInfo struct {
+		Name   string      `json:"name"`
+		Stamps []StampInfo `json:"stamps"`
+	}
+
+	var result []MessageInfo
+
+	for i := 0; ; i += 100 {
+		hit, err := b.BotGetMessagesBeteween(after, before, i)
+		if err != nil {
+			return "", err
+		}
+
+		for _, message := range hit.Hits {
+			stampTotal := 0
+			stampKinds := len(message.Stamps)
+			for _, stampCount := range message.Stamps {
+				stampTotal += int(stampCount.Count)
+			}
+			if stampTotal >= total && stampKinds >= kind {
+				// スタンプ情報を収集
+				var stamps []StampInfo
+				for _, stamp := range message.Stamps {
+					// スタンプUUIDからスタンプ名を取得
+					stampName := b.BotGetStampName(stamp.StampId)
+					stamps = append(stamps, StampInfo{
+						Name:  stampName,
+						Count: int(stamp.Count),
+					})
+				}
+
+				result = append(result, MessageInfo{
+					Name:   message.Id,
+					Stamps: stamps,
+				})
+			}
+		}
+		if len(hit.Hits) < 100 || i == 9900 || len(result) >= maxmes {
+			break
+		}
+	}
+
+	log.Println("Filtered取得数:", len(result))
+
+	// JSONにエンコード
+	jsonBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return "", err
+	}
+
+	b.BotSimpleEdit(responseuuid, string(jsonBytes))
+
+	return string(jsonBytes), nil
 }
 
 //------------------------------------------------
