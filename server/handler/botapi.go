@@ -378,7 +378,6 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 
 		for _, message := range hit.Hits {
 			stampTotal := 0
-			
 
 			// スタンプ情報を収集（同じ名前のスタンプをまとめる）
 			stampMap := make(map[string]int)
@@ -387,8 +386,13 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 				stampName := b.BotGetStampName(stamp.StampId)
 				stampMap[stampName]++
 			}
+			index := 0
 			for _, stampCount := range stampMap {
 				stampTotal += int(stampCount)
+				index++
+				if index >= 5 {
+					break
+				}
 			}
 			stampKinds := len(stampMap)
 			if stampTotal >= total && stampKinds >= kind {
