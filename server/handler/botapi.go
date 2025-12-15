@@ -386,28 +386,30 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 				stampName := b.BotGetStampName(stamp.StampId)
 				stampMap[stampName]++
 			}
-			index := 0
-			for _, stampCount := range stampMap {
-				stampTotal += int(stampCount)
-				index++
-				if index >= 5 {
-					break
-				}
+			
+			var stampSlice []StampInfo
+			for name, count := range stampMap {
+				stampSlice = append(stampSlice, StampInfo{name, count})
+			}
+			sort.Slice(stampSlice, func(i, j int) bool {
+				return stampSlice[i].Count > stampSlice[j].Count
+			})
+			
+			// 上位5件だけ残す
+			if len(stampSlice) > 5 {
+				stampSlice = stampSlice[:5]
+			}
+			
+			stampTotal = 0
+			for _, stamp := range stampSlice {
+				stampTotal += stamp.Count
 			}
 			stampKinds := len(stampMap)
 			if stampTotal >= total && stampKinds >= kind {
 
-				// mapをスライスに変換
+				// スライスをStampInfoに変換
 				var stamps []StampInfo
-				for name, count := range stampMap {
-					stamps = append(stamps, StampInfo{
-						Name:  name,
-						Count: count,
-					})
-					if len(stamps) >= 5 {
-						break
-					}
-				}
+				stamps = append(stamps, stampSlice...)
 
 				result = append(result, MessageInfo{
 					Name:   message.Id,
