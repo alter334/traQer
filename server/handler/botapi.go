@@ -438,7 +438,7 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 	if err != nil {
 		return "", err
 	}
-	resstr := "```\n" + string(jsonBytes) + "```\n"
+	resstr := "```\n" + string(jsonBytes) + "\n```\n"
 	for _, collect := range result {
 		resstr += "https://q.trap.jp/messages/" + collect.Name + "\n"
 	}
