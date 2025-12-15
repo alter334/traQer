@@ -428,6 +428,7 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 			// 動作安定化のため98件で判定
 			break
 		}
+		log.Println("現在のFiltered取得数:", len(result))
 	}
 
 	log.Println("Filtered取得数:", len(result))
@@ -437,7 +438,7 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 	if err != nil {
 		return "", err
 	}
-	resstr := "```\n" + string(jsonBytes) + "\n```"
+	resstr := "```\n" + string(jsonBytes) + "```\n"
 	for _, collect := range result {
 		resstr += "https://q.trap.jp/messages/" + collect.Name + "\n"
 	}
