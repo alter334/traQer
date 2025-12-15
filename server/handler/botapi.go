@@ -383,14 +383,20 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 				stampTotal += int(stampCount.Count)
 			}
 			if stampTotal >= total && stampKinds >= kind {
-				// スタンプ情報を収集
-				var stamps []StampInfo
+				// スタンプ情報を収集（同じ名前のスタンプをまとめる）
+				stampMap := make(map[string]int)
 				for _, stamp := range message.Stamps {
 					// スタンプUUIDからスタンプ名を取得
 					stampName := b.BotGetStampName(stamp.StampId)
+					stampMap[stampName]++
+				}
+
+				// mapをスライスに変換
+				var stamps []StampInfo
+				for name, count := range stampMap {
 					stamps = append(stamps, StampInfo{
-						Name:  stampName,
-						Count: int(stamp.Count),
+						Name:  name,
+						Count: count,
 					})
 				}
 
@@ -413,7 +419,7 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 		return "", err
 	}
 
-	b.BotSimpleEdit(responseuuid, "```\n" + string(jsonBytes) + "\n```")
+	b.BotSimpleEdit(responseuuid, "```\n"+string(jsonBytes)+"\n```")
 
 	return string(jsonBytes), nil
 }
