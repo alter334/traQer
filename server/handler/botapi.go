@@ -359,6 +359,7 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 	response := "searching... :loading:"                     //結果表示用文字列
 	responseuuid := b.BotSimplePost(channeltopost, response) //返信用メッセージの作成
 	type StampInfo struct {
+		UUID  string `json:"uuid"`
 		Name  string `json:"name"`
 		Count int    `json:"count"`
 	}
@@ -383,13 +384,12 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 			stampMap := make(map[string]int)
 			for _, stamp := range message.Stamps {
 				// スタンプUUIDからスタンプ名を取得
-				stampName := b.BotGetStampName(stamp.StampId)
-				stampMap[stampName]++
+				stampMap[stamp.StampId]++
 			}
 
 			var stampSlice []StampInfo
-			for name, count := range stampMap {
-				stampSlice = append(stampSlice, StampInfo{name, count})
+			for id, count := range stampMap {
+				stampSlice = append(stampSlice, StampInfo{id, b.BotGetStampName(id), count})
 			}
 			sort.Slice(stampSlice, func(i, j int) bool {
 				return stampSlice[i].Count > stampSlice[j].Count
