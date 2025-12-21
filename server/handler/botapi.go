@@ -106,6 +106,32 @@ func (b *BotHandler) BotGetUserUUID(userName string) (useruuid string) {
 	return ""
 }
 
+// stamp名からユーザUUIDを取得
+func (b *BotHandler) BotGetStampUUID(stampNames string) (stampuuid string) {
+	// stampNamesはカンマ区切りで複数指定可能
+	stampNamesList := strings.Split(stampNames, ",")
+
+	stamps, httpres, err := b.bot.API().StampApi.GetStamps(context.Background()).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
+	}
+
+	ret := "["
+	for _, stampName := range stampNamesList {
+		for _, u := range stamps {
+			if u.Name == stampName {
+				if ret != "" {
+					ret += ","
+				}
+				ret += u.Id
+			}
+		}
+	}
+	ret += "]"
+	return ret
+}
+
 // group名からグループUUIDを取得
 func (b *BotHandler) BotGetGroupUUID(groupName string) (groupuuid string) {
 	groups, httpres, err := b.bot.API().GroupApi.GetUserGroups(context.Background()).Execute()
