@@ -97,7 +97,7 @@ func (h *Handler) BotHandler() {
 				break
 			} else if cmd[1] == "\\stampnametouuid" {
 				message := h.b.BotSimplePost(p.Message.ChannelID, "Nowcollecting...")
-				h.b.BotSimpleEdit(message, h.b.BotGetStampName(cmd[2]))
+				h.b.BotSimpleEdit(message, h.b.BotGetStampUUID(cmd[2]))
 				break
 			} else {
 				h.b.BotSimplePost(p.Message.ChannelID, "Insert valid commands")
