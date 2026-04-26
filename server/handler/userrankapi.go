@@ -16,7 +16,7 @@ import (
 func (h *Handler) GetUserPostCount() {
 
 	//ユーザリストの取得
-	v, _, err := h.client.UserApi.
+	v, _, err := h.client.UserAPI.
 		GetUsers(h.auth).
 		Execute()
 	if err != nil {
@@ -33,7 +33,7 @@ func (h *Handler) GetUserPostCount() {
 			log.Println("isBot:", i)
 			continue
 		}
-		userStats, _, err := h.client.UserApi.GetUserStats(h.auth, user.Id).Execute()
+		userStats, _, err := h.client.UserAPI.GetUserStats(h.auth, user.Id).Execute()
 		if err != nil {
 			log.Println("Internal error:", err.Error())
 			return
@@ -142,7 +142,7 @@ func (h *Handler) SearchMessagesRunner() {
 
 // 差分取得実施(limit等条件のため)
 func (h *Handler) CorrectUserMessageDiff(from time.Time, to time.Time, offset int) (message *traq.MessageSearchResult, err error) {
-	messages, _, err := h.client.MessageApi.SearchMessages(h.auth).
+	messages, _, err := h.client.MessageAPI.SearchMessages(h.auth).
 		Bot(false).After(from).Before(to).Limit(100).Offset(int32(offset)).Sort(`createdAt`).Execute()
 	if err != nil {
 		return messages, err
@@ -158,7 +158,7 @@ func (h *Handler) CorrectUserMessageDiff(from time.Time, to time.Time, offset in
 // グループ取得の実施 h.nowhavingdata のグループ毎振り分けを行う []UserDetailWithMessageCount,err を返す
 func (h *Handler) GetGroupMembers(groupid string) (res []UserDetailWithMessageCount, httpres *http.Response, err error) {
 	// groupメンバの取得
-	usergroupmember, httpres, err := h.client.GroupApi.GetUserGroupMembers(h.auth, groupid).Execute()
+	usergroupmember, httpres, err := h.client.GroupAPI.GetUserGroupMembers(h.auth, groupid).Execute()
 	if err != nil {
 		log.Println("Internal error:", err.Error())
 		return res, httpres, err
@@ -208,7 +208,7 @@ func (h *Handler) MessageCountsBind(usetraqAPI bool) {
 	var nowcollectingdata []UserDetailWithMessageCount
 
 	for i, messageCount := range dbuserdata {
-		userdetail, _, err := h.client.UserApi.GetUser(h.auth, messageCount.Id).Execute()
+		userdetail, _, err := h.client.UserAPI.GetUser(h.auth, messageCount.Id).Execute()
 		if i <= 2 {
 			log.Println(i+1, ":", messageCount.TotalMessageCount, ":", userdetail.DisplayName)
 		}
@@ -248,7 +248,7 @@ func (h *Handler) MessageCountsBind(usetraqAPI bool) {
 
 // ユーザタグ数取得
 func (h *Handler) GetUserTagCount(userid string) (count int, httpres *http.Response, err error) {
-	res, httpres, err := h.client.UserTagApi.GetUserTags(h.auth, userid).Execute()
+	res, httpres, err := h.client.UserTagAPI.GetUserTags(h.auth, userid).Execute()
 	if err != nil {
 		return 0, httpres, err
 	}

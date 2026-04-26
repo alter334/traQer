@@ -4,7 +4,7 @@ import "log"
 
 func (h *Handler) GetChannelNameWithParents(channelid string, children string) (channelname string, err error) {
 	log.Println(channelname)
-	channel, _, err := h.client.ChannelApi.GetChannel(h.auth, channelid).Execute()
+	channel, _, err := h.client.ChannelAPI.GetChannel(h.auth, channelid).Execute()
 	if err != nil {
 		log.Println("GetChannelError:", err.Error())
 		return "", err
@@ -27,7 +27,7 @@ func (h *Handler) GetChannelNameWithParents(channelid string, children string) (
 }
 
 func (h *Handler) GetViewers(channelid string) (users []string, err error) {
-	userstats, _, err := h.client.ChannelApi.GetChannelViewers(h.auth, channelid).Execute()
+	userstats, _, err := h.client.ChannelAPI.GetChannelViewers(h.auth, channelid).Execute()
 	if err != nil {
 		log.Println("GetViewersError:", err.Error())
 		return users, err

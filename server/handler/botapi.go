@@ -25,7 +25,7 @@ type Messagewithlen struct {
 // ----------------------------------------------------------------
 func (b *BotHandler) BotSimplePost(channelID string, content string) (messageid string) {
 	q, r, err := b.bot.API().
-		MessageApi.
+		MessageAPI.
 		PostMessage(context.Background(), channelID).
 		PostMessageRequest(traq.PostMessageRequest{
 			Content: content,
@@ -41,7 +41,7 @@ func (b *BotHandler) BotSimplePost(channelID string, content string) (messageid 
 
 func (b *BotHandler) BotSimpleEdit(messageid string, content string) {
 	_, err := b.bot.API().
-		MessageApi.EditMessage(context.Background(), messageid).PostMessageRequest(traq.PostMessageRequest{
+		MessageAPI.EditMessage(context.Background(), messageid).PostMessageRequest(traq.PostMessageRequest{
 		Content: content,
 	}).Execute()
 	if err != nil {
@@ -56,7 +56,7 @@ func (b *BotHandler) BotSimpleEdit(messageid string, content string) {
 
 func (b *BotHandler) BotDM(userid string, content string) {
 	_, r, err := b.bot.API().
-		MessageApi.
+		MessageAPI.
 		PostDirectMessage(context.Background(), userid).
 		PostMessageRequest(traq.PostMessageRequest{
 			Content: content,
@@ -73,7 +73,7 @@ func (b *BotHandler) BotDM(userid string, content string) {
 
 // User名をUUIDから返す
 func (b *BotHandler) BotGetUserName(postUserID string) (userName string) {
-	userdetail, httpres, err := b.bot.API().UserApi.GetUser(context.Background(), postUserID).Execute()
+	userdetail, httpres, err := b.bot.API().UserAPI.GetUser(context.Background(), postUserID).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
@@ -83,7 +83,7 @@ func (b *BotHandler) BotGetUserName(postUserID string) (userName string) {
 
 // MessageをUUIDから返す
 func (b *BotHandler) BotGetMessage(messageuuid string) (message *traq.Message) {
-	message, httpres, err := b.bot.API().MessageApi.GetMessage(context.Background(), messageuuid).Execute()
+	message, httpres, err := b.bot.API().MessageAPI.GetMessage(context.Background(), messageuuid).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
@@ -93,7 +93,7 @@ func (b *BotHandler) BotGetMessage(messageuuid string) (message *traq.Message) {
 
 // user名からユーザUUIDを取得
 func (b *BotHandler) BotGetUserUUID(userName string) (useruuid string) {
-	users, httpres, err := b.bot.API().UserApi.GetUsers(context.Background()).Execute()
+	users, httpres, err := b.bot.API().UserAPI.GetUsers(context.Background()).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
@@ -111,7 +111,7 @@ func (b *BotHandler) BotGetStampUUID(stampNames string) (stampuuid string) {
 	// stampNamesはカンマ区切りで複数指定可能
 	stampNamesList := strings.Split(stampNames, ",")
 
-	stamps, httpres, err := b.bot.API().StampApi.GetStamps(context.Background()).Execute()
+	stamps, httpres, err := b.bot.API().StampAPI.GetStamps(context.Background()).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
@@ -134,7 +134,7 @@ func (b *BotHandler) BotGetStampUUID(stampNames string) (stampuuid string) {
 
 // group名からグループUUIDを取得
 func (b *BotHandler) BotGetGroupUUID(groupName string) (groupuuid string) {
-	groups, httpres, err := b.bot.API().GroupApi.GetUserGroups(context.Background()).Execute()
+	groups, httpres, err := b.bot.API().GroupAPI.GetUserGroups(context.Background()).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
@@ -149,7 +149,7 @@ func (b *BotHandler) BotGetGroupUUID(groupName string) (groupuuid string) {
 
 // groupUUIDからグループ所属者を返す
 func (b *BotHandler) BotGetGroupMembers(groupid string) (groupmembersids []string) {
-	usergroupmember, httpres, err := b.bot.API().GroupApi.GetUserGroupMembers(context.Background(), groupid).Execute()
+	usergroupmember, httpres, err := b.bot.API().GroupAPI.GetUserGroupMembers(context.Background(), groupid).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
@@ -163,7 +163,7 @@ func (b *BotHandler) BotGetGroupMembers(groupid string) (groupmembersids []strin
 
 // UserのホームチャンネルUUIDを返す
 func (b *BotHandler) GetUserHome(userID string) (homeUUID string) {
-	userdetail, httpres, err := b.bot.API().UserApi.GetUser(context.Background(), userID).Execute()
+	userdetail, httpres, err := b.bot.API().UserAPI.GetUser(context.Background(), userID).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
@@ -173,7 +173,7 @@ func (b *BotHandler) GetUserHome(userID string) (homeUUID string) {
 
 // スタンプUUIDからスタンプ名を返す
 func (b *BotHandler) BotGetStampName(stampID string) (stampName string) {
-	stamp, httpres, err := b.bot.API().StampApi.GetStamp(context.Background(), stampID).Execute()
+	stamp, httpres, err := b.bot.API().StampAPI.GetStamp(context.Background(), stampID).Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", httpres)
@@ -340,8 +340,8 @@ func (b *BotHandler) BotWUserrank(after string, before string, channeltopost str
 
 // 選択したuserからメッセージを100件取得する(Bot版)
 func (b *BotHandler) BotGetUserMessages(userid string, offset int) (message *traq.MessageSearchResult, err error) {
-	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
-		From(userid).Limit(100).Offset(int32(offset)).
+	messages, _, err := b.bot.API().MessageAPI.SearchMessages(context.Background()).
+		From([]string{userid}).Limit(100).Offset(int32(offset)).
 		Sort(`createdAt`).Execute()
 	if err != nil {
 		return messages, err
@@ -368,7 +368,7 @@ func (b *BotHandler) BotGetMessagesBeteween(after string, before string, offset 
 	if err != nil {
 		return nil, err
 	}
-	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
+	messages, _, err := b.bot.API().MessageAPI.SearchMessages(context.Background()).
 		After(aftertime).Before(beforetime).Limit(100).Offset(int32(offset)).
 		Sort(`createdAt`).Execute()
 	if err != nil {
@@ -480,7 +480,7 @@ func (b *BotHandler) BotGetStampedMessage(total int, kind int, maxmes int, after
 
 // 指定したチャンネルからメッセージを100件取得する
 func (b *BotHandler) BotGetChannelMessages(channelid string, offset int) (message *traq.MessageSearchResult, err error) {
-	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
+	messages, _, err := b.bot.API().MessageAPI.SearchMessages(context.Background()).
 		In(channelid).Limit(10).Offset(int32(offset)).
 		Sort(`createdAt`).Execute()
 	if err != nil {
@@ -493,7 +493,7 @@ func (b *BotHandler) BotGetChannelMessages(channelid string, offset int) (messag
 
 // 引用ありのみ
 func (b *BotHandler) BotGetChannelMessagesWithQuote(channelid string, offset int) (message *traq.MessageSearchResult, err error) {
-	messages, _, err := b.bot.API().MessageApi.SearchMessages(context.Background()).
+	messages, _, err := b.bot.API().MessageAPI.SearchMessages(context.Background()).
 		In(channelid).Limit(10).Offset(int32(offset)).HasURL(true).
 		Sort(`-createdAt`).Execute()
 	if err != nil {
