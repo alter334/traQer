@@ -27,16 +27,16 @@ func (h *Handler) BotCollectUserRank(groupName string) (x string) {
 		// 	}
 		// }
 		totalCount := 0;
-		for i, data := range h.nowhavingdata {
+		for _, data := range h.nowhavingdata {
 			// homebase := "https://q.trap.jp/channels/"
 			// homename, err := h.GetChannelNameWithParents(data.Homechannel, "")
 			// if err != nil {
 			// 	homename = ""
 			// }
 			totalCount += int(data.TotalMessageCount)
-			if i == 99 {
-				break
-			}
+			// if i == 99 {
+			// 	break
+			// }
 		}
 		res += ("|" + "0" + "|" + "合計" + "|" + strconv.Itoa(totalCount) + "|\n")
 		return res
@@ -69,9 +69,9 @@ func (h *Handler) BotCollectUserRank(groupName string) (x string) {
 			// }
 			totalCount += int(data.TotalMessageCount)
 			// res += ("|" + strconv.Itoa(ct) + "|[:@" + data.Name + ": " + data.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(data.TotalMessageCount)) + "|\n")
-			if ct == 100 {
-				break
-			}
+			// if ct == 100 {
+			// 	break
+			// }
 
 		}
 	}
