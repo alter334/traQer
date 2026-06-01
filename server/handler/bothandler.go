@@ -15,17 +15,30 @@ func (h *Handler) BotCollectUserRank(groupName string) (x string) {
 	//グループ指定なしなら全ユーザランク付
 	if groupName == "" {
 		res = "全ユーザー投稿数ランキング\n|順位|ユーザー|投稿数|\n|---|---|---|\n"
+		// for i, data := range h.nowhavingdata {
+		// 	homebase := "https://q.trap.jp/channels/"
+		// 	homename, err := h.GetChannelNameWithParents(data.Homechannel, "")
+		// 	if err != nil {
+		// 		homename = ""
+		// 	}
+		// 	res += ("|" + strconv.Itoa(i+1) + "|[:@" + data.Name + ": " + data.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(data.TotalMessageCount)) + "|\n")
+		// 	if i == 99 {
+		// 		break
+		// 	}
+		// }
+		totalCount := 0;
 		for i, data := range h.nowhavingdata {
-			homebase := "https://q.trap.jp/channels/"
-			homename, err := h.GetChannelNameWithParents(data.Homechannel, "")
-			if err != nil {
-				homename = ""
-			}
-			res += ("|" + strconv.Itoa(i+1) + "|[:@" + data.Name + ": " + data.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(data.TotalMessageCount)) + "|\n")
+			// homebase := "https://q.trap.jp/channels/"
+			// homename, err := h.GetChannelNameWithParents(data.Homechannel, "")
+			// if err != nil {
+			// 	homename = ""
+			// }
+			totalCount += int(data.TotalMessageCount)
 			if i == 99 {
 				break
 			}
 		}
+		res += ("|" + "0" + "|" + "合計" + "|" + strconv.Itoa(totalCount) + "|\n")
 		return res
 	}
 
@@ -44,22 +57,25 @@ func (h *Handler) BotCollectUserRank(groupName string) (x string) {
 
 	//全ユーザーに対してグループ存在するか探索 100件拾ったら終了
 	ct := 0
+	totalCount := 0;
 	for _, data := range h.nowhavingdata {
 		_, exist := groupmembermap[data.Id]
 		if exist {
 			ct++
-			homebase := "https://q.trap.jp/channels/"
-			homename, err := h.GetChannelNameWithParents(data.Homechannel, "")
-			if err != nil {
-				homename = ""
-			}
-			res += ("|" + strconv.Itoa(ct) + "|[:@" + data.Name + ": " + data.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(data.TotalMessageCount)) + "|\n")
+			// homebase := "https://q.trap.jp/channels/"
+			// homename, err := h.GetChannelNameWithParents(data.Homechannel, "")
+			// if err != nil {
+			// 	homename = ""
+			// }
+			totalCount += int(data.TotalMessageCount)
+			// res += ("|" + strconv.Itoa(ct) + "|[:@" + data.Name + ": " + data.Name + "](" + homebase + homename + ")|" + strconv.Itoa(int(data.TotalMessageCount)) + "|\n")
 			if ct == 100 {
 				break
 			}
 
 		}
 	}
+	res += ("|" + "0" + "|" + "合計" + "|" + strconv.Itoa(totalCount) + "|\n")
 	return res
 
 }
